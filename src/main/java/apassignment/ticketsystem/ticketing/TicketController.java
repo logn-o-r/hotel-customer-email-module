@@ -3,7 +3,6 @@ package apassignment.ticketsystem.ticketing;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.layout.*;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.fontawesome.FontAwesome;
@@ -31,21 +30,28 @@ public class TicketController {
         loadTicketsFromFile("ticket.txt");
     }
 
+    //set TicketSorterController as parent to allow the arrow button to switch scenes
+    private TicketSorterController parentController;
+
     private void loadTicketsFromFile(String filename) {
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String line;
             while ((line = reader.readLine()) != null) { //while loop to stop reading once file has no more lines
-                String[] parts = line.split("\\|");
 
-                if (parts.length < 7) continue; //skips the line in file if the data is not in correct format
-
-                //ticket data format: TicketID | Subject | Status | Description | Priority | AssignedAgentUserID | SubmittedByUserID
+                //ticket data format: TicketID | Subject | Status | Description | Priority | AssignedAgentUserID | SubmittedByUserID | dateSubmitted
                 //divides the lines into parts based on order of data in ticket meant to be displayed.
+                String[] parts = line.split("\\|");
+                if (parts.length < 8) continue; //skips the line in file if the data is not in correct format
 
                 //data from ticket.txt displayed on ui
+                String id = parts[0].trim();
                 String subject = parts[1].trim();
                 String status = parts[2].trim();
                 String description = parts[3].trim();
+                String priority = parts[4].trim(); //not displayed for customer
+                String assignedAgent = parts[5].trim(); //not displayed for customer
+                String submittedBy = parts[6].trim();
+                String dateSubmitted = parts[7].trim();
 
                 //create ticket row
                 GridPane ticektRow = new GridPane();
@@ -99,6 +105,23 @@ public class TicketController {
                 viewButton.setMinWidth(50);
                 HBox.setHgrow(viewButton, Priority.NEVER);
 
+                viewButton.setOnAction(e -> {
+                    if (parentController != null) {
+                        parentController.showTicketDetails(
+                                id,
+                                subject,
+                                status,
+                                dateSubmitted,
+                                submittedBy,
+                                description
+                        );
+                    } else {
+                        System.out.println("Parent controller is null.");
+                    }
+                });
+
+
+
                 ticektRow.add(subjectLabel, 0, 0);  // Column 0
                 ticektRow.add(statusBox, 1, 0);     // Column 1
                 ticektRow.add(descLabel, 2, 0);     // Column 2
@@ -113,6 +136,12 @@ public class TicketController {
             e.printStackTrace();
         }
 
+    }
+
+    //sets TicketSorterController as the parent to allow functions to pass
+    public void setParent(TicketSorterController parent) {
+        this.parentController = parent;
+        System.out.println("Parent controller set!");
     }
 
     // to make so that the status is displayed as a symbol instead of text
@@ -138,6 +167,7 @@ public class TicketController {
         }
         return iconView;
     }
+
 
     //function to load fxml file into the main content of app
 //    private void loadView() {
