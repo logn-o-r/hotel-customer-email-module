@@ -4,7 +4,10 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -23,20 +26,26 @@
             <Button mnemonicParsing="false" text="New Ticket" />
          </children>
       </HBox>
-      <HBox alignment="CENTER_LEFT" prefHeight="17.0" prefWidth="600.0">
+      <GridPane hgap="10.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="NEVER" prefWidth="180.0" />
+          <ColumnConstraints hgrow="NEVER" prefWidth="100.0" />
+            <ColumnConstraints hgrow="ALWAYS" prefWidth="100.0" />
+            <ColumnConstraints hgrow="NEVER" prefWidth="50.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
          <children>
-            <Label prefWidth="180.0" text="Subject" />
-            <Label prefWidth="50.0" text="Status">
-               <HBox.margin>
-                  <Insets />
-               </HBox.margin>
-            </Label>
-            <Label prefWidth="300.0" text="Description" />
+            <Label prefWidth="180.0" text="Subject" GridPane.hgrow="NEVER" />
+            <Label prefWidth="100.0" text="Status" GridPane.columnIndex="1" GridPane.hgrow="NEVER" />
+            <Label text="Description" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" />
+            <Label prefWidth="50.0" GridPane.columnIndex="3" GridPane.hgrow="NEVER" />
          </children>
          <padding>
-            <Insets bottom="3.0" right="3.0" top="3.0" />
+            <Insets bottom="5.0" left="5.0" right="5.0" />
          </padding>
-      </HBox>
+      </GridPane>
        <ScrollPane fitToWidth="true" prefHeight="583.0" prefWidth="709.0">
            <content>
                <VBox fx:id="ticketContainer" maxWidth="Infinity" prefWidth="Infinity" spacing="10.0" />

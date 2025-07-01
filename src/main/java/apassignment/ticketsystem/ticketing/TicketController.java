@@ -1,6 +1,7 @@
 package apassignment.ticketsystem.ticketing;
 
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.*;
@@ -47,14 +48,27 @@ public class TicketController {
                 String description = parts[3].trim();
 
                 //create ticket row
-                HBox ticketBox = new HBox(10);
-                ticketBox.setStyle("-fx-padding: 10; -fx-border-color: gray; -fx-background-color: #F5F5F5;");
-                ticketBox.setAlignment(Pos.CENTER_LEFT);
+                GridPane ticektRow = new GridPane();
+                ticektRow.setHgap(10);
+                ticektRow.setVgap(5);
+                ticektRow.setPadding(new Insets(5));
+                ticektRow.setStyle("-fx-border-color: gray; -fx-background-color: #F5F5F5;");
+
+                //for alignment text
+                ColumnConstraints col1 = new ColumnConstraints();
+                col1.setMinWidth(180); // subject label
+                ColumnConstraints col2 = new ColumnConstraints();
+                col2.setMinWidth(100); // status Icon
+                ColumnConstraints col3 = new ColumnConstraints();
+                col3.setHgrow(Priority.ALWAYS); // description label (expandable)
+                ColumnConstraints col4 = new ColumnConstraints();
+                col4.setMinWidth(50); // arrow to view ticket
+                ticektRow.getColumnConstraints().addAll(col1, col2, col3, col4);
 
                 //subject of ticket
                 Label subjectLabel = new Label(subject);
-                subjectLabel.setMaxWidth(Double.MAX_VALUE);
-                HBox.setHgrow(subjectLabel, Priority.ALWAYS);
+                subjectLabel.setMaxWidth(180);
+                HBox.setHgrow(subjectLabel, Priority.NEVER);
 
                 //status of ticket as a symbol using fontawesome
                 FontIcon statusIcon = getStatusIcons(status);
@@ -62,14 +76,14 @@ public class TicketController {
                 statusIcon.setIconColor(Color.BLACK);
                 // Wrap status in an HBox for consistent layout
                 HBox statusBox = new HBox(statusIcon);
-                statusBox.setAlignment(Pos.CENTER);
-                statusBox.setPrefWidth(50);
+                statusBox.setAlignment(Pos.CENTER_LEFT);
+                statusBox.setPrefWidth(100);
 
                 //description of ticket
                 Label descLabel = new Label(description);
                 descLabel.setWrapText(true);
                 descLabel.setMaxWidth(Double.MAX_VALUE);
-                HBox.setHgrow(descLabel, Priority.ALWAYS);
+                HBox.setHgrow(descLabel, Priority.NEVER);
 
                 //space to push arrow button to the far right
                 Region space = new Region();
@@ -82,11 +96,15 @@ public class TicketController {
                 //Creating the button for the arrow
                 Button viewButton = new Button();
                 viewButton.setGraphic(arrowIcon);
-                viewButton.setMinWidth(40);
+                viewButton.setMinWidth(50);
                 HBox.setHgrow(viewButton, Priority.NEVER);
 
-                ticketBox.getChildren().addAll(subjectLabel, statusIcon, descLabel, space, viewButton);
-                ticketContainer.getChildren().add(ticketBox);
+                ticektRow.add(subjectLabel, 0, 0);  // Column 0
+                ticektRow.add(statusBox, 1, 0);     // Column 1
+                ticektRow.add(descLabel, 2, 0);     // Column 2
+                ticektRow.add(viewButton, 3, 0);    // Column 3
+
+                ticketContainer.getChildren().add(ticektRow);
 
             }
 
