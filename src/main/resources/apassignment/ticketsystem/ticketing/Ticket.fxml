@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="690.0" spacing="10.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="apassignment.ticketsystem.ticketing.TicketController">
+   <padding>
+      <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+   </padding>
+   <children>
+      <HBox alignment="CENTER_LEFT" prefHeight="35.0" prefWidth="709.0" spacing="75.0">
+         <children>
+            <Label text="My Tickets">
+               <font>
+                  <Font size="20.0" />
+               </font>
+            </Label>
+            <Button mnemonicParsing="false" text="New Ticket" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER_LEFT" prefHeight="17.0" prefWidth="600.0">
+         <children>
+            <Label prefWidth="180.0" text="Subject" />
+            <Label prefWidth="50.0" text="Status">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Label>
+            <Label prefWidth="300.0" text="Description" />
+         </children>
+         <padding>
+            <Insets bottom="3.0" right="3.0" top="3.0" />
+         </padding>
+      </HBox>
+       <ScrollPane fitToWidth="true" prefHeight="583.0" prefWidth="709.0">
+           <content>
+               <VBox fx:id="ticketContainer" maxWidth="Infinity" prefWidth="Infinity" spacing="10.0" />
+           </content>
+       </ScrollPane>
+   </children>
+</VBox>
