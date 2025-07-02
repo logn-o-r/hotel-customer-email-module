@@ -11,9 +11,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
 
 public class TicketController {
 
@@ -33,7 +35,13 @@ public class TicketController {
     //set TicketSorterController as parent to allow the arrow button to switch scenes
     private TicketSorterController parentController;
 
-    private void loadTicketsFromFile(String filename) {
+    //used to filter displayed tickets by status
+    private List<String[]> allTicketData = new ArrayList<>(); //to store parsed lines
+
+    public void loadTicketsFromFile(String filename) {
+        //to store in case the ticket needs to be modified on display (inconsistency prevention)
+        List<String> updatedLines = new ArrayList<>();
+
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String line;
             while ((line = reader.readLine()) != null) { //while loop to stop reading once file has no more lines
@@ -42,6 +50,7 @@ public class TicketController {
                 //divides the lines into parts based on order of data in ticket meant to be displayed.
                 String[] parts = line.split("\\|");
                 if (parts.length < 8) continue; //skips the line in file if the data is not in correct format
+                allTicketData.add(parts); // store ticket data for filtering
 
                 //data from ticket.txt displayed on ui
                 String id = parts[0].trim();
@@ -52,6 +61,17 @@ public class TicketController {
                 String assignedAgent = parts[5].trim(); //not displayed for customer
                 String submittedBy = parts[6].trim();
                 String dateSubmitted = parts[7].trim();
+
+                String currentStatus = status; //for when status is changed
+                //check if open ticket has a response, as to change it to in-progress
+                if (status.equalsIgnoreCase("Open") && hasResponse(id)) {
+                    currentStatus = "In-Progress";
+                    parts[2] = currentStatus;
+                }
+                String updatedLine = String.join(" | ", Arrays.stream(parts).map(String::trim).toArray(String[]::new));
+                updatedLines.add(updatedLine);
+                //to stop an error as status needs to be 'effectively final'
+                String finalStatus = currentStatus;
 
                 //create ticket row
                 GridPane ticektRow = new GridPane();
@@ -77,7 +97,7 @@ public class TicketController {
                 HBox.setHgrow(subjectLabel, Priority.NEVER);
 
                 //status of ticket as a symbol using fontawesome
-                FontIcon statusIcon = getStatusIcons(status);
+                FontIcon statusIcon = getStatusIcons(finalStatus);
                 statusIcon.setIconSize(16);
                 statusIcon.setIconColor(Color.BLACK);
                 // Wrap status in an HBox for consistent layout
@@ -110,7 +130,7 @@ public class TicketController {
                         parentController.showTicketDetails(
                                 id,
                                 subject,
-                                status,
+                                finalStatus,
                                 dateSubmitted,
                                 submittedBy,
                                 description
@@ -119,8 +139,6 @@ public class TicketController {
                         System.out.println("Parent controller is null.");
                     }
                 });
-
-
 
                 ticektRow.add(subjectLabel, 0, 0);  // Column 0
                 ticektRow.add(statusBox, 1, 0);     // Column 1
@@ -135,8 +153,133 @@ public class TicketController {
         catch (IOException e) {
             e.printStackTrace();
         }
+        //to overwrite and update ticket file with updated info
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("ticket.txt"))) {
+            for (String updatedLine : updatedLines) {
+                writer.write(updatedLine);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
+
+    //for making sure status is assigned properly as open tickets are tickets without a response
+    //while tickets with responses are considered in-progress
+    private boolean hasResponse(String ticketID) {
+        try (BufferedReader br = new BufferedReader(new FileReader("response.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split("\\|");
+                if (parts.length >= 1 && parts[0].trim().equals(ticketID)) {
+                    return true; // ticket has a response
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false; // ticket has no response attched
+    }
+
+
+    //used to filter displayed tickets by status
+    public void filterTickets(Predicate<String[]> filterCondition) {
+        ticketContainer.getChildren().clear();
+
+        for (String[] parts : allTicketData) {
+            if (parts.length < 8) continue;
+
+            String id = parts[0].trim();
+            String subject = parts[1].trim();
+            String status = parts[2].trim();
+            String description = parts[3].trim();
+            String priority = parts[4].trim();
+            String assignedAgent = parts[5].trim();
+            String submittedBy = parts[6].trim();
+            String dateSubmitted = parts[7].trim();
+
+            if (!filterCondition.test(parts)) continue;
+
+            //ticket row builder from loadTicketsFromFile
+            //create ticket row
+            GridPane ticektRow = new GridPane();
+            ticektRow.setHgap(10);
+            ticektRow.setVgap(5);
+            ticektRow.setPadding(new Insets(5));
+            ticektRow.setStyle("-fx-border-color: gray; -fx-background-color: #F5F5F5;");
+
+            //for alignment text
+            ColumnConstraints col1 = new ColumnConstraints();
+            col1.setMinWidth(180); // subject label
+            ColumnConstraints col2 = new ColumnConstraints();
+            col2.setMinWidth(100); // status Icon
+            ColumnConstraints col3 = new ColumnConstraints();
+            col3.setHgrow(Priority.ALWAYS); // description label (expandable)
+            ColumnConstraints col4 = new ColumnConstraints();
+            col4.setMinWidth(50); // arrow to view ticket
+            ticektRow.getColumnConstraints().addAll(col1, col2, col3, col4);
+
+            //subject of ticket
+            Label subjectLabel = new Label(subject);
+            subjectLabel.setMaxWidth(180);
+            HBox.setHgrow(subjectLabel, Priority.NEVER);
+
+            //status of ticket as a symbol using fontawesome
+            FontIcon statusIcon = getStatusIcons(status);
+            statusIcon.setIconSize(16);
+            statusIcon.setIconColor(Color.BLACK);
+            // Wrap status in an HBox for consistent layout
+            HBox statusBox = new HBox(statusIcon);
+            statusBox.setAlignment(Pos.CENTER_LEFT);
+            statusBox.setPrefWidth(100);
+
+            //description of ticket
+            Label descLabel = new Label(description);
+            descLabel.setWrapText(true);
+            descLabel.setMaxWidth(Double.MAX_VALUE);
+            HBox.setHgrow(descLabel, Priority.NEVER);
+
+            //space to push arrow button to the far right
+            Region space = new Region();
+            HBox.setHgrow(space, Priority.ALWAYS);
+
+            //to create the arrow icon for the 'view the ticket' button
+            FontIcon arrowIcon = new FontIcon(FontAwesome.ARROW_RIGHT);
+            arrowIcon.setIconSize(16);
+            arrowIcon.setIconColor(Color.BLACK);
+            //Creating the button for the arrow
+            Button viewButton = new Button();
+            viewButton.setGraphic(arrowIcon);
+            viewButton.setMinWidth(50);
+            HBox.setHgrow(viewButton, Priority.NEVER);
+
+            viewButton.setOnAction(e -> {
+                if (parentController != null) {
+                    parentController.showTicketDetails(
+                            id,
+                            subject,
+                            status,
+                            dateSubmitted,
+                            submittedBy,
+                            description
+                    );
+                } else {
+                    System.out.println("Parent controller is null.");
+                }
+            });
+
+
+
+            ticektRow.add(subjectLabel, 0, 0);  // Column 0
+            ticektRow.add(statusBox, 1, 0);     // Column 1
+            ticektRow.add(descLabel, 2, 0);     // Column 2
+            ticektRow.add(viewButton, 3, 0);    // Column 3
+
+            ticketContainer.getChildren().add(ticektRow);
+        }
+    }
+
 
     //sets TicketSorterController as the parent to allow functions to pass
     public void setParent(TicketSorterController parent) {

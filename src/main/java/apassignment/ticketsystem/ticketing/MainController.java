@@ -57,7 +57,14 @@ public class MainController {
     //function to load fxml file into the main content of app
     private void loadView(String fxmlFile) {
         try{
-            Node content = FXMLLoader.load(getClass().getResource(fxmlFile));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
+            Node content = loader.load();
+
+            //for debugging and making sure the ticket button works
+            //if (fxmlFile.equals("TicketSorter.fxml")) {
+                //System.out.println("Ticekt button pressed");
+            //}
+
             mainContent.getChildren().setAll(content);
         }
         catch (IOException e) {

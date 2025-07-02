@@ -13,7 +13,7 @@
 
 <ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="apassignment.ticketsystem.ticketing.TicketDetailController">
   <content>
-    <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="596.0">
+    <AnchorPane fx:id="ticketDetailsContainer" minHeight="0.0" minWidth="0.0" prefWidth="596.0">
          <children>
             <Button fx:id="backButton" layoutX="15.0" layoutY="26.0" mnemonicParsing="false" text="Back" />
             <Label fx:id="ticektSubjectTitle" layoutX="80.0" layoutY="24.0" text="Ticket Subject">
@@ -35,7 +35,7 @@
                   <VBox fx:id="responseContainer" prefHeight="62.0" prefWidth="523.0" spacing="10.0" />
                   <VBox alignment="CENTER" prefWidth="100.0" spacing="10.0">
                      <children>
-                        <Button fx:id="ticketCloseButton" mnemonicParsing="false" text="Close Ticket" />
+                        <Button fx:id="ticketCloseButton" mnemonicParsing="false" onAction="#handleCloseTicket" text="Close Ticket" />
                         <Button fx:id="addResponseButton" mnemonicParsing="false" onAction="#showResponseInputnButton" text="Add Response" visible="false" />
                      </children>
                   </VBox>

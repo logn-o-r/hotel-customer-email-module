@@ -2,11 +2,9 @@ package apassignment.ticketsystem.ticketing;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -17,8 +15,14 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class TicketDetailController implements Initializable {
@@ -49,7 +53,12 @@ public class TicketDetailController implements Initializable {
 
     private String ticketID;
 
+    private String ticketStatus;
+
     private TicketSorterController parentController;
+
+    private Pane parentContainer;
+
 
     public void setTicketDetails(String id, String subject, String status, String createdDate, String userId, String description) {
 
@@ -57,6 +66,7 @@ public class TicketDetailController implements Initializable {
         //sets the title of ticekt to the ticket's subject
         ticektSubjectTitle.setText(subject);
 
+        this.ticketStatus = status;
         //sets the status symbol next to its symbol
         FontIcon statusIcon = getStatusIcons(status);
         statusIcon.setIconSize(16);
@@ -195,6 +205,74 @@ public class TicketDetailController implements Initializable {
     public void setParentController(TicketSorterController parentController) {
         this.parentController = parentController;
     }
+
+    //event for close ticket button
+    @FXML
+    private void handleCloseTicket() {
+        //confirmation prompt for input validation and user statisfaction
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Close Ticket");
+        confirmation.setHeaderText("Are you sure you want to close this ticket?");
+        confirmation.setContentText("This action cannot be undone.");
+
+        ButtonType yesButton = new ButtonType("Yes"); //sets ticket to close
+        ButtonType noButton = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE); //clsoes alert
+
+        confirmation.getButtonTypes().setAll(yesButton, noButton);
+
+        Optional<ButtonType> result = confirmation.showAndWait();
+        if (result.isPresent() && result.get() == yesButton) {
+            closeTicketAndSave(); //updates ticket status to close
+        }
+    }
+
+    private void closeTicketAndSave() {
+        this.ticketStatus = "Closed"; // Update status
+        updateTicketStatusInFile(ticketID, "Closed"); //method to update ticket status
+
+        ticketCloseButton.setDisable(true); //removes close ticket button
+
+        //refresh ticket details
+        parentController.showTicketDetails(
+                ticketID,
+                ticektSubjectTitle.getText(),
+                "Closed",
+                dateCreated.getText().replace("Created on : ", ""),
+                userSubmitted.getText().replace("Submitted by : ", ""),
+                ((Text) descriptionContainer.getChildren().get(0)).getText()
+        );
+    }
+
+    private void updateTicketStatusInFile(String ticketId, String newStatus) {
+        Path path = Paths.get("ticket.txt");
+        List<String> updatedLines = new ArrayList<>();
+
+        try (BufferedReader reader = Files.newBufferedReader(path)) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split("\\|");
+                if (parts.length >= 8 && parts[0].trim().equals(ticketId)) {
+                    parts[2] = newStatus; // update ticket status
+                    line = String.join(" | ", parts); // writes the new status
+                }
+                updatedLines.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            Files.write(path, updatedLines); //updates ticket.txt file
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //to allow TicketDetailsController to have access to parent container
+    public void setParentContainer(Pane parent) {
+        this.parentContainer = parent;
+    }
+
 
     //button to go back to ticket row view
     @Override

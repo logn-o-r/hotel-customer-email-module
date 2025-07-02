@@ -1,3 +1,6 @@
-TCK001 | Cannot login | Open | User cannot login to the dashboard. | High | AGT001 | CUST007 | 01/07/2025
-TCK002 | UI Bug | In-Progress | Buttons overlap on small screen. | Medium | AGT002 | CUST010 | 01/07/2025
-TCK003 | Feature Request | Closed | Please add dark mode. | Low | AGT003 | CUST005 | 01/07/2025
+TCK001 | Cannot login | In-Progress | User cannot login to the dashboard. | High | AGT001 | CUST007 | 01/07/2025
+TCK002 | UI Bug | In-Progress | Buttons overlap on small screen. | Medium | AGT002 | CUST007 | 01/07/2025
+TCK003 | Feature Request | Closed | Please add dark mode. | Low | AGT003 | CUST007 | 01/07/2025
+TCK004 | Cannot login | Open | User cannot login to the dashboard. | High | AGT001 | CUST001 | 01/07/2025
+TCK005 | UI Bug | In-Progress | Buttons overlap on small screen. | Medium | AGT002 | CUST002 | 01/07/2025
+TCK006 | Feature Request | Closed | Please add dark mode. | Low | AGT003 | CUST003 | 01/07/2025
