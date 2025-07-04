@@ -1,4 +1,4 @@
-package apassignment.ticketsystem.ticketing;
+package apassignment;
 
 
 import javafx.application.Application;
@@ -16,7 +16,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("Main.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/apassignment/fxml/Main.fxml"));
             Scene scene = new Scene(root, 1000, 700);
             stage.setTitle("JavaFX Customer Service Application");
             stage.setScene(scene);

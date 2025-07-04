@@ -1,4 +1,4 @@
-package apassignment.ticketsystem.ticketing;
+package apassignment;
 
 import javafx.scene.control.Alert;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -43,7 +43,7 @@ public class MainController {
 
         //Set click handlers (to make the label icons into buttons)
         //dashboardIcon.setOnMouseClicked(e -> loadView("Dashboard.fxml"));
-        ticketIcon.setOnMouseClicked(e -> loadView("TicketSorter.fxml"));
+        ticketIcon.setOnMouseClicked(e -> loadView("/apassignment/fxml/ticketingsystem/TicketSorter.fxml"));
         //faqIcon.setOnMouseClicked(e -> loadView("FAQ.fxml"));
         //chatIcon.setOnMouseClicked(e -> loadView("LiveChat.fxml"));
         //emailIcon.setOnMouseClicked(e -> loadView("Email.fxml"));

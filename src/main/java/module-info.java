@@ -8,6 +8,8 @@ module apassignment.ticketsystem.ticketing {
     requires java.desktop;
     requires java.logging;
 
-    opens apassignment.ticketsystem.ticketing to javafx.fxml;
-    exports apassignment.ticketsystem.ticketing;
+    opens apassignment to javafx.fxml;
+    exports apassignment;
+    exports apassignment.ticketingsystem;
+    opens apassignment.ticketingsystem to javafx.fxml;
 }

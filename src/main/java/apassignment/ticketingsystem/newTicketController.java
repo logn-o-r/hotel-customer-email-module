@@ -1,4 +1,4 @@
-package apassignment.ticketsystem.ticketing;
+package apassignment.ticketingsystem;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;

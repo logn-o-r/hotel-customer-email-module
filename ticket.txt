@@ -7,3 +7,4 @@ TCK006 | Feature Request | Closed | Please add dark mode. | Low | AGT003 | CUST0
 TCK007 | Application isnt colourful enough | Open | make it more colourful please | Low | null | CUST007 | 04/07/2025
 TCK008 | Only Ticketing System Works? | Open | Why dosen't any of the other features work? Are the devs lazy? | Low | null | CUST007 | 04/07/2025
 TCK009 | Problem with button | Open | button somewher dosent work!!!!! | Low | null | CUST007 | 04/07/2025
+TCK010 | Ticket 23 | Open | description very nice | Low | null | CUST007 | 04/07/2025

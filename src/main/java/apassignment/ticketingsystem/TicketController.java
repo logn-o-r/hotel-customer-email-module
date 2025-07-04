@@ -1,4 +1,4 @@
-package apassignment.ticketsystem.ticketing;
+package apassignment.ticketingsystem;
 
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -409,6 +409,113 @@ public class TicketController {
         }
     }
 
+    //used to filter displayed tickets by status
+    public void searchFilterTickets(Predicate<String[]> filterCondition, String userIdFilter) {
+        ticketContainer.getChildren().clear();
+
+        for (String[] parts : allTicketData) {
+            if (parts.length < 8) continue;
+
+            String id = parts[0].trim();
+            String subject = parts[1].trim();
+            String status = parts[2].trim();
+            String description = parts[3].trim();
+            String priority = parts[4].trim();
+            String assignedAgent = parts[5].trim();
+            String submittedBy = parts[6].trim();
+            String dateSubmitted = parts[7].trim();
+
+            //put filers condition
+            if (!filterCondition.test(parts)) continue;
+
+            //to filter by which is the current logged-in user
+            // if user is customer it shows by who submitted the ticket
+            if (userIdFilter != null && userIdFilter.startsWith("CUST")) {
+                if (!submittedBy.equals(userIdFilter)) continue;
+            }
+            else if (userIdFilter != null && userIdFilter.startsWith("AGT")) {
+                if (!assignedAgent.equals(userIdFilter)) continue;
+            }
+
+            //ticket row builder from loadTicketsFromFile
+            //create ticket row
+            GridPane ticektRow = new GridPane();
+            ticektRow.setHgap(10);
+            ticektRow.setVgap(5);
+            ticektRow.setPadding(new Insets(5));
+            ticektRow.setStyle("-fx-border-color: gray; -fx-background-color: #FFFFFF;");
+
+            //for alignment text
+            ColumnConstraints col1 = new ColumnConstraints();
+            col1.setMinWidth(180); // subject label
+            ColumnConstraints col2 = new ColumnConstraints();
+            col2.setMinWidth(100); // status Icon
+            ColumnConstraints col3 = new ColumnConstraints();
+            col3.setHgrow(Priority.ALWAYS); // description label (expandable)
+            ColumnConstraints col4 = new ColumnConstraints();
+            col4.setMinWidth(50); // arrow to view ticket
+            ticektRow.getColumnConstraints().addAll(col1, col2, col3, col4);
+
+            //subject of ticket
+            Label subjectLabel = new Label(subject);
+            subjectLabel.setMaxWidth(180);
+            HBox.setHgrow(subjectLabel, Priority.NEVER);
+
+            //status of ticket as a symbol using fontawesome
+            FontIcon statusIcon = getStatusIcons(status);
+            statusIcon.setIconSize(16);
+            statusIcon.setIconColor(Color.BLACK);
+            // Wrap status in an HBox for consistent layout
+            HBox statusBox = new HBox(statusIcon);
+            statusBox.setAlignment(Pos.CENTER_LEFT);
+            statusBox.setPrefWidth(100);
+
+            //description of ticket
+            Label descLabel = new Label(description);
+            descLabel.setWrapText(true);
+            descLabel.setMaxWidth(Double.MAX_VALUE);
+            HBox.setHgrow(descLabel, Priority.NEVER);
+
+            //space to push arrow button to the far right
+            Region space = new Region();
+            HBox.setHgrow(space, Priority.ALWAYS);
+
+            //to create the arrow icon for the 'view the ticket' button
+            FontIcon arrowIcon = new FontIcon(FontAwesome.ARROW_RIGHT);
+            arrowIcon.setIconSize(16);
+            arrowIcon.setIconColor(Color.BLACK);
+            //Creating the button for the arrow
+            Button viewButton = new Button();
+            viewButton.setGraphic(arrowIcon);
+            viewButton.setMinWidth(50);
+            HBox.setHgrow(viewButton, Priority.NEVER);
+
+            viewButton.setOnAction(e -> {
+                if (parentController != null) {
+                    parentController.showTicketDetails(
+                            id,
+                            subject,
+                            status,
+                            dateSubmitted,
+                            submittedBy,
+                            description
+                    );
+                } else {
+                    System.out.println("Parent controller is null.");
+                }
+            });
+
+
+
+            ticektRow.add(subjectLabel, 0, 0);  // Column 0
+            ticektRow.add(statusBox, 1, 0);     // Column 1
+            ticektRow.add(descLabel, 2, 0);     // Column 2
+            ticektRow.add(viewButton, 3, 0);    // Column 3
+
+            ticketContainer.getChildren().add(ticektRow);
+        }
+    }
+
     //sets TicketSorterController as the parent to allow functions to pass
     public void setParent(TicketSorterController parent) {
         this.parentController = parent;
@@ -445,7 +552,7 @@ public class TicketController {
         if (isNewTicketFormOpen) return; // prevents duplicates from opening if button is clicked multiple
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("newTicketForm.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/apassignment/fxml/ticketingsystem/newTicketForm.fxml"));
             Parent formRoot = loader.load();
 
             // Get controller to set necessary references if needed
@@ -513,7 +620,7 @@ public class TicketController {
     //function to load fxml file into the main content of app
 //    private void loadView() {
 //        try{
-//            Node content = FXMLLoader.load(getClass().getResource(newTicket.fxml));
+//            Node content = FXMLLoader.load(getClass().getResource(/apassignment/fxml/ticketingsystem/newTicket.fxml));
 //            mainContent.getChildren().setAll(content);
 //        }
 //        catch (IOException e) {

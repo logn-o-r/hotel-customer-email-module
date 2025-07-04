@@ -1,4 +1,4 @@
-package apassignment.ticketsystem.ticketing;
+package apassignment.ticketingsystem;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -33,7 +33,7 @@ public class TicketSorterController {
     @FXML
     private void handleSearch() {
         String keyword = searchBox.getText().trim().toLowerCase();
-        ticketController.filterTickets(parts -> parts[1].trim().toLowerCase().contains(keyword));
+        ticketController.searchFilterTickets(parts -> parts[1].trim().toLowerCase().contains(keyword), currentLoggedUserID);
     }
 
     //display only open tickets
@@ -59,7 +59,7 @@ public class TicketSorterController {
         //first thing it loads is all the tickets
         try {
             currentLoggedUserID = "CUST007"; // need to code so it is based on currently logged user
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("Ticket.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/apassignment/fxml/ticketingsystem/Ticket.fxml"));
             Node content = loader.load();
 
             // Set parent controller on TicketController
@@ -90,7 +90,7 @@ public class TicketSorterController {
             Node content = loader.load();
 
             //to make sure they are parent when it loads again
-            if (fxmlFile.equals("Ticket.fxml")) {
+            if (fxmlFile.equals("/apassignment/fxml/ticketingsystem/Ticket.fxml")) {
                 TicketController ticketController = loader.getController();
                 ticketController.setParent(this);
                 this.ticketController = ticketController; //save refernce
@@ -112,7 +112,7 @@ public class TicketSorterController {
 
     public void showTicketDetails(String id, String subject, String status, String dateCreated, String submittedBy, String description) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("TicketDetail.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/apassignment/fxml/ticketingsystem/TicketDetail.fxml"));
             Node detailView = loader.load();
 
             // pass values for tickets

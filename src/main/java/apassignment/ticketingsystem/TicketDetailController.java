@@ -1,4 +1,4 @@
-package apassignment.ticketsystem.ticketing;
+package apassignment.ticketingsystem;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -280,7 +280,7 @@ public class TicketDetailController implements Initializable {
         try {
             Files.write(path, updatedLines); //updates ticket.txt file
         } catch (IOException e) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to update and save new ticket staus.", e);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to update and save new ticket status.", e);
         }
     }
 
@@ -303,7 +303,7 @@ public class TicketDetailController implements Initializable {
         HBox.setHgrow(backButton, Priority.NEVER);
 
         backButton.setOnAction(event -> {
-            parentController.loadView("Ticket.fxml");
+            parentController.loadView("/apassignment/fxml/ticketingsystem/Ticket.fxml");
         });
     }
 
