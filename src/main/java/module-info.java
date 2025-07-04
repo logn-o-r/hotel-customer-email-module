@@ -6,6 +6,7 @@ module apassignment.ticketsystem.ticketing {
     requires org.kordamp.ikonli.core;
     requires org.kordamp.ikonli.fontawesome;
     requires java.desktop;
+    requires java.logging;
 
     opens apassignment.ticketsystem.ticketing to javafx.fxml;
     exports apassignment.ticketsystem.ticketing;

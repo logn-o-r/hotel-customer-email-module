@@ -4,3 +4,6 @@ TCK003 | Feature Request | Closed | Please add dark mode. | Low | AGT003 | CUST0
 TCK004 | Cannot login | Open | User cannot login to the dashboard. | High | AGT001 | CUST001 | 01/07/2025
 TCK005 | UI Bug | In-Progress | Buttons overlap on small screen. | Medium | AGT002 | CUST002 | 01/07/2025
 TCK006 | Feature Request | Closed | Please add dark mode. | Low | AGT003 | CUST003 | 01/07/2025
+TCK007 | Application isnt colourful enough | Open | make it more colourful please | Low | null | CUST007 | 04/07/2025
+TCK008 | Only Ticketing System Works? | Open | Why dosen't any of the other features work? Are the devs lazy? | Low | null | CUST007 | 04/07/2025
+TCK009 | Problem with button | Open | button somewher dosent work!!!!! | Low | null | CUST007 | 04/07/2025

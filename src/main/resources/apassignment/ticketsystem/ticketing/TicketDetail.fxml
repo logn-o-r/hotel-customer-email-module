@@ -22,8 +22,16 @@
                </font>
             </Label>
             <Line endX="100.0" layoutX="116.0" layoutY="63.0" startX="-100.0" />
-            <HBox fx:id="statusContainer" layoutX="440.0" layoutY="16.0" prefHeight="31.0" prefWidth="139.0" />
-            <Label fx:id="dateCreated" layoutX="448.0" layoutY="45.0" text="Created on:" />
+            <VBox layoutX="438.0" layoutY="13.0">
+               <children>
+                  <HBox fx:id="statusContainer" alignment="CENTER" style="-fx-background-color: #000000;">
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </HBox>
+                  <Label fx:id="dateCreated" text="Created on:" />
+               </children>
+            </VBox>
             <VBox layoutX="15.0" layoutY="68.0" prefWidth="570.0" spacing="10.0">
                <children>
                   <VBox prefWidth="570.0">

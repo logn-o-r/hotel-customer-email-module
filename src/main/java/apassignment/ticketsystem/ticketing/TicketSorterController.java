@@ -3,14 +3,19 @@ package apassignment.ticketsystem.ticketing;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.layout.StackPane;
 
 import javafx.scene.control.TextField;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TicketSorterController {
 
     private TicketController ticketController;
+
+    private String currentLoggedUserID;
 
     @FXML
     private StackPane secondaryContent;
@@ -34,27 +39,26 @@ public class TicketSorterController {
     //display only open tickets
     @FXML
     private void handleOpenTickets() {
-        ticketController.filterTickets(parts -> parts[2].trim().equalsIgnoreCase("Open"));
+        ticketController.filterTicketsStatusUser("Open", currentLoggedUserID);
     }
 
     //display only inprogress tickets
     @FXML
     private void handleInProgressTickets() {
-        ticketController.filterTickets(parts -> parts[2].trim().equalsIgnoreCase("In-Progress"));
+        ticketController.filterTicketsStatusUser("In-Progress", currentLoggedUserID);
     }
 
-    //display only closed ticekts
+    //display only closed ticekts belonging to the current user
     @FXML
     private void handleClosedTickets() {
-        ticketController.filterTickets(parts -> parts[2].trim().equalsIgnoreCase("Closed"));
+        ticketController.filterTicketsStatusUser("Closed", currentLoggedUserID);
     }
 
 
     public void initialize() {
-
         //first thing it loads is all the tickets
         try {
-            String userId = "CUST007"; // need to code so it is based on currently logged user
+            currentLoggedUserID = "CUST007"; // need to code so it is based on currently logged user
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Ticket.fxml"));
             Node content = loader.load();
 
@@ -64,15 +68,19 @@ public class TicketSorterController {
             this.ticketController = ticketController; //save refernce
 
             //so only tickets belong to the currently logged on customer/user is displayed
-            ticketController.filterTickets(parts -> parts[6].trim().equals(userId));
+            ticketController.filterTickets(parts -> parts[6].trim().equals(currentLoggedUserID));
 
             // dsiplays the tickets in list
             secondaryContent.getChildren().setAll(content);
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to load Ticket.fxml", e);
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Ticket Loading Error");
+            alert.setHeaderText("Could not load ticket view");
+            alert.setContentText("An error occurred while initializing the ticket screen. Please contact support.");
+            alert.showAndWait();
         }
-
-
     }
 
     //function to load fxml file into the main content of app
@@ -91,7 +99,13 @@ public class TicketSorterController {
             secondaryContent.getChildren().setAll(content);
         }
         catch (IOException e) {
-            e.printStackTrace();
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to load FXML view: " + fxmlFile, e);
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Scene Load Error");
+            alert.setHeaderText("Could Not Load View");
+            alert.setContentText("The requested scene could not be loaded. Please try again later.");
+            alert.showAndWait();
         }
     }
 
@@ -111,7 +125,13 @@ public class TicketSorterController {
             // displays the ticket details in right panel
             secondaryContent.getChildren().setAll(detailView);
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to load TicketDetail.fxml", e);
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Ticket Details Loading Error");
+            alert.setHeaderText("Could not load ticket details");
+            alert.setContentText("An error occurred while initializing the ticket details. Please contact support.");
+            alert.showAndWait();
         }
     }
 

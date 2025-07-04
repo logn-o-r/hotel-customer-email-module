@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TicketDetailController implements Initializable {
 
@@ -70,9 +72,10 @@ public class TicketDetailController implements Initializable {
         //sets the status symbol next to its symbol
         FontIcon statusIcon = getStatusIcons(status);
         statusIcon.setIconSize(16);
-        statusIcon.setIconColor(Color.BLACK);
+        statusIcon.setIconColor(Color.WHITE);
         Label statusLabel = new Label(" " + status);
         statusLabel.setFont(new Font(16));
+        statusLabel.setTextFill(Color.WHITE);
         statusContainer.getChildren().addAll(statusIcon, statusLabel);
 
         //sets the date it was created
@@ -119,7 +122,7 @@ public class TicketDetailController implements Initializable {
 
                 lastUser = responder;
 
-                // Builds the response card
+                // Builds the response card, makes them purple like in UI Wireframe
                 VBox card = new VBox();
                 card.setStyle("-fx-background-color: #D3BFFF; -fx-padding: 10; -fx-spacing: 5; -fx-background-radius: 10;");
 
@@ -136,7 +139,14 @@ public class TicketDetailController implements Initializable {
                 responseContainer.getChildren().add(card);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to load responses from file.", e);
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("File Read Error");
+            alert.setHeaderText("Unable to Read and Load Ticket Responses");
+            alert.setContentText("There was a problem reading the responses. Please try again later.");
+            alert.showAndWait();
+
         }
 
         // Check if last user who responded was an agent
@@ -168,7 +178,13 @@ public class TicketDetailController implements Initializable {
             writer.write("\n"+ticketID + " | " + responderID + " | " + content + " | " + date);
             writer.newLine();
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to submit response.", e);
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Submission Failed");
+            alert.setHeaderText("Could not submit the response");
+            alert.setContentText("An error occurred while submitting the response. Please try again later.");
+            alert.showAndWait();
         }
 
         responseText.clear();
@@ -258,13 +274,13 @@ public class TicketDetailController implements Initializable {
                 updatedLines.add(line);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to read current ticket status.", e);
         }
 
         try {
             Files.write(path, updatedLines); //updates ticket.txt file
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to update and save new ticket staus.", e);
         }
     }
 

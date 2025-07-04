@@ -3,7 +3,12 @@ package apassignment.ticketsystem.ticketing;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.layout.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.fontawesome.FontAwesome;
 import javafx.scene.paint.Color;
@@ -16,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TicketController {
 
@@ -26,6 +33,12 @@ public class TicketController {
     //to load the new ticket form into
     @FXML
     private StackPane mainContent;
+
+    //for setting the new ticket button and form
+    @FXML
+    private VBox secondaryContent;
+    private boolean isNewTicketFormOpen = false;
+    private String currentUserID = "CUST007"; //need to set this to user that is currently logged on
 
     @FXML
     public void initialize() {
@@ -78,7 +91,7 @@ public class TicketController {
                 ticektRow.setHgap(10);
                 ticektRow.setVgap(5);
                 ticektRow.setPadding(new Insets(5));
-                ticektRow.setStyle("-fx-border-color: gray; -fx-background-color: #F5F5F5;");
+                ticektRow.setStyle("-fx-border-color: gray; -fx-background-color: #FFFFFF;");
 
                 //for alignment text
                 ColumnConstraints col1 = new ColumnConstraints();
@@ -151,7 +164,15 @@ public class TicketController {
 
         }
         catch (IOException e) {
-            e.printStackTrace();
+            //to show user there was an error when reading or loading tickets from file
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to read and load from ticket.txt", e);
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Failed to Read and Load Tickets");
+            alert.setContentText("An error occurred while reading and loading the tickets. Please try again later.");
+            alert.showAndWait();
+
         }
         //to overwrite and update ticket file with updated info
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("ticket.txt"))) {
@@ -160,7 +181,7 @@ public class TicketController {
                 writer.newLine();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to update ticket.txt", e);
         }
 
     }
@@ -177,7 +198,7 @@ public class TicketController {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to read from response.txt", e);
         }
         return false; // ticket has no response attched
     }
@@ -199,6 +220,7 @@ public class TicketController {
             String submittedBy = parts[6].trim();
             String dateSubmitted = parts[7].trim();
 
+            //put filers condition
             if (!filterCondition.test(parts)) continue;
 
             //ticket row builder from loadTicketsFromFile
@@ -207,7 +229,7 @@ public class TicketController {
             ticektRow.setHgap(10);
             ticektRow.setVgap(5);
             ticektRow.setPadding(new Insets(5));
-            ticektRow.setStyle("-fx-border-color: gray; -fx-background-color: #F5F5F5;");
+            ticektRow.setStyle("-fx-border-color: gray; -fx-background-color: #FFFFFF;");
 
             //for alignment text
             ColumnConstraints col1 = new ColumnConstraints();
@@ -280,6 +302,112 @@ public class TicketController {
         }
     }
 
+    //to filter by status and userID
+    public void filterTicketsStatusUser(String statusFilter, String userIdFilter) {
+        //same code as filterTicekts
+        ticketContainer.getChildren().clear();
+
+        for (String[] parts : allTicketData) {
+            if (parts.length < 8) continue;
+
+            String id = parts[0].trim();
+            String subject = parts[1].trim();
+            String status = parts[2].trim();
+            String description = parts[3].trim();
+            String priority = parts[4].trim();
+            String assignedAgent = parts[5].trim();
+            String submittedBy = parts[6].trim();
+            String dateSubmitted = parts[7].trim();
+
+            //filters by status
+            if (!status.equalsIgnoreCase(statusFilter)) continue;
+
+            //to filter by which is the current logged-in user
+            // if user is customer it shows by who submitted the ticket
+            if (userIdFilter != null && userIdFilter.startsWith("CUST")) {
+                if (!submittedBy.equals(userIdFilter)) continue;
+            }
+            else if (userIdFilter != null && userIdFilter.startsWith("AGT")) {
+                if (!assignedAgent.equals(userIdFilter)) continue;
+            }
+            //ticket row builder from loadTicketsFromFile
+            //create ticket row
+            GridPane ticektRow = new GridPane();
+            ticektRow.setHgap(10);
+            ticektRow.setVgap(5);
+            ticektRow.setPadding(new Insets(5));
+            ticektRow.setStyle("-fx-border-color: gray; -fx-background-color: #FFFFFF;");
+
+            //for alignment text
+            ColumnConstraints col1 = new ColumnConstraints();
+            col1.setMinWidth(180); // subject label
+            ColumnConstraints col2 = new ColumnConstraints();
+            col2.setMinWidth(100); // status Icon
+            ColumnConstraints col3 = new ColumnConstraints();
+            col3.setHgrow(Priority.ALWAYS); // description label (expandable)
+            ColumnConstraints col4 = new ColumnConstraints();
+            col4.setMinWidth(50); // arrow to view ticket
+            ticektRow.getColumnConstraints().addAll(col1, col2, col3, col4);
+
+            //subject of ticket
+            Label subjectLabel = new Label(subject);
+            subjectLabel.setMaxWidth(180);
+            HBox.setHgrow(subjectLabel, Priority.NEVER);
+
+            //status of ticket as a symbol using fontawesome
+            FontIcon statusIcon = getStatusIcons(status);
+            statusIcon.setIconSize(16);
+            statusIcon.setIconColor(Color.BLACK);
+            // Wrap status in an HBox for consistent layout
+            HBox statusBox = new HBox(statusIcon);
+            statusBox.setAlignment(Pos.CENTER_LEFT);
+            statusBox.setPrefWidth(100);
+
+            //description of ticket
+            Label descLabel = new Label(description);
+            descLabel.setWrapText(true);
+            descLabel.setMaxWidth(Double.MAX_VALUE);
+            HBox.setHgrow(descLabel, Priority.NEVER);
+
+            //space to push arrow button to the far right
+            Region space = new Region();
+            HBox.setHgrow(space, Priority.ALWAYS);
+
+            //to create the arrow icon for the 'view the ticket' button
+            FontIcon arrowIcon = new FontIcon(FontAwesome.ARROW_RIGHT);
+            arrowIcon.setIconSize(16);
+            arrowIcon.setIconColor(Color.BLACK);
+            //Creating the button for the arrow
+            Button viewButton = new Button();
+            viewButton.setGraphic(arrowIcon);
+            viewButton.setMinWidth(50);
+            HBox.setHgrow(viewButton, Priority.NEVER);
+
+            viewButton.setOnAction(e -> {
+                if (parentController != null) {
+                    parentController.showTicketDetails(
+                            id,
+                            subject,
+                            status,
+                            dateSubmitted,
+                            submittedBy,
+                            description
+                    );
+                } else {
+                    System.out.println("Parent controller is null.");
+                }
+            });
+
+
+
+            ticektRow.add(subjectLabel, 0, 0);  // Column 0
+            ticektRow.add(statusBox, 1, 0);     // Column 1
+            ticektRow.add(descLabel, 2, 0);     // Column 2
+            ticektRow.add(viewButton, 3, 0);    // Column 3
+
+            ticketContainer.getChildren().add(ticektRow);
+        }
+    }
 
     //sets TicketSorterController as the parent to allow functions to pass
     public void setParent(TicketSorterController parent) {
@@ -309,6 +437,76 @@ public class TicketController {
                 break;
         }
         return iconView;
+    }
+
+    //opens the new ticket creation form
+    @FXML
+    private void handleNewTicketButton() {
+        if (isNewTicketFormOpen) return; // prevents duplicates from opening if button is clicked multiple
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("newTicketForm.fxml"));
+            Parent formRoot = loader.load();
+
+            // Get controller to set necessary references if needed
+            newTicketController formController = loader.getController();
+            formController.setParentController(this);
+            formController.setSubmittedByUserID(currentUserID);
+            formController.setOnCloseCallback(() -> isNewTicketFormOpen = false); // Optional clean-up
+
+            Stage formStage = new Stage();
+            formStage.setTitle("Create New Ticket Form");
+            formStage.setScene(new Scene(formRoot));
+            formStage.setResizable(false);
+            formStage.initModality(Modality.APPLICATION_MODAL); // to block interaction with main window
+            formStage.show();
+
+            isNewTicketFormOpen = true;
+
+            // When closed manually
+            formStage.setOnHidden(e -> isNewTicketFormOpen = false);
+        } catch (IOException e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to run newTicketForm.fxml.", e);
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Scene Load Error");
+            alert.setHeaderText("Could Not Open New Ticket Form");
+            alert.setContentText("An error occurred while trying to open the ticket form. Please try again later.");
+            alert.showAndWait();
+        }
+    }
+
+
+    //to clsoe the new ticket form
+    public void closeNewTicketForm() {
+        secondaryContent.getChildren().clear();
+        isNewTicketFormOpen = false;
+    }
+
+    //to refresh ticket list
+    public void reloadTickets() {
+        // re-reads the ticket.txt file to display updated ticket list
+        List<String[]> newData = new ArrayList<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("ticket.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split("\\|");
+                if (parts.length >= 8) {
+                    newData.add(parts);
+                }
+            }
+        } catch (IOException e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to read and load from ticket.txt", e);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Failed to Read and Load Tickets");
+            alert.setContentText("An error occurred while fetching lastest ticket data. Please try again later.");
+            alert.showAndWait();
+        }
+
+        allTicketData = newData;
+        filterTickets(parts -> parts[6].trim().equals(currentUserID));
     }
 
 

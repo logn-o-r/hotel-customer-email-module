@@ -23,7 +23,7 @@
                   <Font size="20.0" />
                </font>
             </Label>
-            <Button mnemonicParsing="false" text="New Ticket" />
+            <Button fx:id="newTicketButton" mnemonicParsing="false" onAction="#handleNewTicketButton" text="New Ticket" />
          </children>
       </HBox>
       <GridPane hgap="10.0">

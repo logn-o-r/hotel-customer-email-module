@@ -1,5 +1,6 @@
 package apassignment.ticketsystem.ticketing;
 
+import javafx.scene.control.Alert;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.fontawesome.FontAwesome;
 import javafx.scene.paint.Color;
@@ -10,6 +11,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MainController {
 
@@ -68,7 +71,14 @@ public class MainController {
             mainContent.getChildren().setAll(content);
         }
         catch (IOException e) {
-            e.printStackTrace();
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to load FXML view: " + fxmlFile, e);
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Scene Load Error");
+            alert.setHeaderText("Could Not Load View");
+            alert.setContentText("The requested scene could not be loaded. Please try again later.");
+            alert.showAndWait();
+
         }
     }
 }
