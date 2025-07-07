@@ -24,6 +24,8 @@ public class MainController {
     @FXML
     private Label dashboardIcon;
     @FXML
+    private Label usermanagementIcon;
+    @FXML
     private Label ticketIcon;
     @FXML
     private Label faqIcon;
@@ -36,6 +38,7 @@ public class MainController {
     public void initialize() {
         //To set icons
         setIcon(dashboardIcon, FontAwesome.HOME);
+        setIcon(usermanagementIcon, FontAwesome.USERS);
         setIcon(ticketIcon, FontAwesome.TICKET);
         setIcon(faqIcon, FontAwesome.QUESTION_CIRCLE);
         setIcon(chatIcon, FontAwesome.COMMENTS);
@@ -43,6 +46,7 @@ public class MainController {
 
         //Set click handlers (to make the label icons into buttons)
         //dashboardIcon.setOnMouseClicked(e -> loadView("Dashboard.fxml"));
+        //usermanagementIcon.setOnMouseClicked(e -> loadView("Dashboard.fxml"))
         ticketIcon.setOnMouseClicked(e -> loadView("/apassignment/fxml/ticketingsystem/TicketSorter.fxml"));
         //faqIcon.setOnMouseClicked(e -> loadView("FAQ.fxml"));
         //chatIcon.setOnMouseClicked(e -> loadView("LiveChat.fxml"));

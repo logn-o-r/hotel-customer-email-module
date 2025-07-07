@@ -25,6 +25,20 @@
                   </VBox>
                   <VBox alignment="TOP_CENTER" prefHeight="55.0" prefWidth="69.0" spacing="5.0">
                      <children>
+                        <Label fx:id="usermanagementIcon" />
+                        <VBox alignment="TOP_CENTER">
+                           <children>
+                              <Label text="Manage" />
+                              <Label text="User" />
+                           </children>
+                        </VBox>
+                     </children>
+                     <cursor>
+                        <Cursor fx:constant="OPEN_HAND" />
+                     </cursor>
+                  </VBox>
+                  <VBox alignment="TOP_CENTER" prefHeight="55.0" prefWidth="69.0" spacing="5.0">
+                     <children>
                         <Label fx:id="ticketIcon" />
                         <Label text="Ticket" />
                      </children>

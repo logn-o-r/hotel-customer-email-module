@@ -122,9 +122,9 @@ public class TicketDetailController implements Initializable {
 
                 lastUser = responder;
 
-                // Builds the response card, makes them purple like in UI Wireframe
+                // Builds the response card
                 VBox card = new VBox();
-                card.setStyle("-fx-background-color: #D3BFFF; -fx-padding: 10; -fx-spacing: 5; -fx-background-radius: 10;");
+                card.setStyle("-fx-background-color: #FFFFFF; -fx-padding: 10; -fx-spacing: 5; -fx-background-radius: 10;");
 
                 Label authorLabel = new Label(responder);
                 authorLabel.setStyle("-fx-font-weight: bold");
