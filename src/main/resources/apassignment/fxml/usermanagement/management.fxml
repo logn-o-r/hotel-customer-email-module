@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="apassignment.usermanagement.ManagementController">
+   <children>
+      <Separator layoutX="54.0" layoutY="37.0" orientation="VERTICAL" prefHeight="363.0" prefWidth="0.0" />
+      <Separator layoutY="37.0" prefHeight="0.0" prefWidth="700.0" />
+      <HBox layoutX="66.0" layoutY="52.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="44.0" prefWidth="632.0">
+         <children>
+            <Label fx:id="management_lbl" alignment="CENTER_RIGHT" contentDisplay="RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="19.0" prefWidth="114.0" text="User Management">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font></Label>
+            <Label alignment="TOP_RIGHT" contentDisplay="RIGHT" prefHeight="17.0" prefWidth="497.0" />
+            <Button fx:id="createuser_btn" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="25.0" prefWidth="143.0" style="-fx-background-color: #000000;" text="↘ Create A New User" textFill="#b902c3" />
+         </children>
+      </HBox>
+      <HBox layoutX="66.0" layoutY="85.0" prefHeight="37.0" prefWidth="523.0">
+         <children>
+            <Label fx:id="username_lbl" minWidth="120.0" prefWidth="120.0" text="Username" />
+            <Label fx:id="userid_lbl" minWidth="80.0" prefWidth="80.0" text="UserID" />
+            <Label fx:id="email_lbl" minWidth="200.0" prefWidth="200.0" text="Email" />
+            <Label maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" text="Role" />
+         </children>
+      </HBox>
+      <VBox layoutX="66.0" layoutY="122.0" prefHeight="275.0" prefWidth="523.0" />
+   </children>
+</AnchorPane>

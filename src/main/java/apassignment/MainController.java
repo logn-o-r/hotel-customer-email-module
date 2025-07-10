@@ -46,7 +46,7 @@ public class MainController {
 
         //Set click handlers (to make the label icons into buttons)
         //dashboardIcon.setOnMouseClicked(e -> loadView("Dashboard.fxml"));
-        //usermanagementIcon.setOnMouseClicked(e -> loadView("Dashboard.fxml"))
+        usermanagementIcon.setOnMouseClicked(e -> loadView("/apassignment/fxml/usermanagement/management.fxml"));
         ticketIcon.setOnMouseClicked(e -> loadView("/apassignment/fxml/ticketingsystem/TicketSorter.fxml"));
         //faqIcon.setOnMouseClicked(e -> loadView("FAQ.fxml"));
         //chatIcon.setOnMouseClicked(e -> loadView("LiveChat.fxml"));

@@ -11,5 +11,7 @@ module apassignment.ticketsystem.ticketing {
     opens apassignment to javafx.fxml;
     exports apassignment;
     exports apassignment.ticketingsystem;
+    exports apassignment.usermanagement;
     opens apassignment.ticketingsystem to javafx.fxml;
+    opens apassignment.usermanagement to javafx.fxml;
 }

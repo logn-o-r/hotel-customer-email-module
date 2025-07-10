@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="apassignment.usermanagement.logInController">
+   <children>
+      <Button fx:id="logIn_btn" layoutX="367.0" layoutY="431.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="266.0" text="Log In" />
+      <TextField fx:id="name_field" layoutX="367.0" layoutY="250.0" prefHeight="40.0" prefWidth="266.0" />
+      <PasswordField fx:id="psd_field" layoutX="367.0" layoutY="350.0" prefHeight="40.0" prefWidth="266.0" />
+      <Label fx:id="name_lbl" layoutX="367.0" layoutY="209.0" text="User name or email">
+         <font>
+            <Font size="11.0" />
+         </font>
+      </Label>
+      <Label fx:id="psd_lbl" layoutX="367.0" layoutY="316.0" prefHeight="17.0" prefWidth="77.0" text="Password">
+         <font>
+            <Font size="11.0" />
+         </font>
+      </Label>
+      <Label fx:id="login_lbl" layoutX="457.0" layoutY="147.0" text="Log In">
+         <font>
+            <Font name="System Bold" size="29.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>
