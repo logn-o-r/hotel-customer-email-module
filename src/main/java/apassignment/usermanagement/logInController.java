@@ -12,7 +12,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+//for recording which user is currently logged in
+//to make an easily accesable varible to get teh userID of the current logged in User
+import apassignment.util.UserSession;
+
 public class logInController {
+
+
     @FXML private TextField name_field;
     @FXML private PasswordField psd_field;
     @FXML private Button logIn_btn;
@@ -34,8 +40,15 @@ public class logInController {
                 String[] userData = line.split(",");
                 if (userData.length >= 5) {
                     String username = userData[0].trim();
+                    String userID = userData[1].trim();
+                    String email = userData[2].trim();
                     String password = userData[3].trim();
-                    userCredentials.put(username, password);
+
+                    String value = password + "|" + userID;
+
+                    // store using both username and email as keys
+                    userCredentials.put(username, value);
+                    userCredentials.put(email, value);
                 }
             }
         } catch (IOException e) {
@@ -45,24 +58,30 @@ public class logInController {
     }
 
     private void handleLogin() {
-        String username = name_field.getText().trim();
+        String usernameEmail = name_field.getText().trim();
         String password = psd_field.getText().trim();
 
-        if (username.isEmpty() || password.isEmpty()) {
+        if (usernameEmail.isEmpty() || password.isEmpty()) {
             login_lbl.setText("Please enter both username and password");
             return;
         }
 
-        if (isValidCredentials(username, password)) {
+        if (isValidCredentials(usernameEmail, password)) {
+            //extracts userID from map and stores it as current session
+            String userID = userCredentials.get(usernameEmail).split("\\|")[1];
+            UserSession.setCurrentUserID(userID);
+
             try {
-                // Load main.fxml
-                Parent root = FXMLLoader.load(getClass().getResource("/apassignment/fxml/main.fxml"));
+                // Load appropriate main view based on userID prefix
+                Parent root;
+                if (userID.startsWith("ADM")) { //opens only admin side of app
+                    root = FXMLLoader.load(getClass().getResource("/apassignment/fxml/AdminMain.fxml"));
+                } else {
+                    root = FXMLLoader.load(getClass().getResource("/apassignment/fxml/Main.fxml"));
+                }
+
                 Scene scene = new Scene(root);
-
-                // Get current stage
                 Stage stage = (Stage) logIn_btn.getScene().getWindow();
-
-                // Set new scene
                 stage.setScene(scene);
                 stage.setTitle("Main Application");
                 stage.show();
@@ -75,8 +94,12 @@ public class logInController {
         }
     }
 
-    private boolean isValidCredentials(String username, String password) {
-        return userCredentials.containsKey(username) &&
-                userCredentials.get(username).equals(password);
+    private boolean isValidCredentials(String input, String password) {
+        if (userCredentials.containsKey(input)) {
+            String[] data = userCredentials.get(input).split("\\|");
+            String storedPassword = data[0];
+            return storedPassword.equals(password);
+        }
+        return false;
     }
 }

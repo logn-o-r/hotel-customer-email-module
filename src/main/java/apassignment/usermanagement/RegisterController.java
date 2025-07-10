@@ -64,13 +64,20 @@ public class RegisterController {
             msg_lbl.setText("Error saving data");
         }
     }
+
+    //ensures no id is reused or overlaped when a new one is created
     private String generateUniqueUserID() {
         try {
             List<String> lines = Files.readAllLines(Paths.get("users.txt"));
             int maxId = lines.stream()
-                    .map(line -> line.split("\\|")[0].trim().replace("TCK", ""))
+                    //splits the line by comma (,) and takes the first part assuming userID is the first
+                    // it removes any leading/trailing whitespace then removes the CUST, AGT, or ADM prefix
+                    //leaving the nummeric part
+                    .map(line -> line.split(",")[0].trim().replaceAll("^(CUST|AGT|ADM)", ""))
+                    //then ensures only valid numeric IDs are passed/filters the stream to keep only the strings that are pure digits
                     .filter(id -> id.matches("\\d+"))
                     .mapToInt(Integer::parseInt)
+                    //finds the largest code/highest userID, if it has no max, returns 0
                     .max().orElse(0);
             return String.format("CUST%03d", maxId + 1);
         } catch (IOException e) {

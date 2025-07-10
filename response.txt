@@ -4,3 +4,6 @@ TCK001 | AGT001 | Issue resolved. | 03/07/2025
 TCK003 | AGT003 | No. | 03/07/2025
 TCK002 | AGT002 | We are trying our best to solve it. Thank you for your patience. | 03/07/2025
 TCK001 | CUST007 | Is It though? | 02/07/2025
+TCK001 | AGT003 | it is, now stop | 11/07/2025
+TCK004 | AGT003 | ok we set up the log in ui, try again | 11/07/2025
+TCK005 | AGT003 | blah blah | 11/07/2025

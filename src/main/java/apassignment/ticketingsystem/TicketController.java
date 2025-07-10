@@ -1,5 +1,6 @@
 package apassignment.ticketingsystem;
 
+import apassignment.util.UserSession;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -38,11 +39,19 @@ public class TicketController {
     @FXML
     private VBox secondaryContent;
     private boolean isNewTicketFormOpen = false;
-    private String currentUserID = "CUST007"; //need to set this to user that is currently logged on
+
+    @FXML
+    Button newTicketButton;
+
+    private String currentUserID = UserSession.getCurrentUserID();
 
     @FXML
     public void initialize() {
+        String currentUserID = UserSession.getCurrentUserID();
         loadTicketsFromFile("ticket.txt");
+        if (currentUserID.startsWith("ADM") || currentUserID.startsWith("AGT")) {
+            newTicketButton.setVisible(false); // hides new ticket button for agents and admin
+        }
     }
 
     //set TicketSorterController as parent to allow the arrow button to switch scenes
@@ -144,6 +153,8 @@ public class TicketController {
                                 id,
                                 subject,
                                 finalStatus,
+                                priority,
+                                assignedAgent,
                                 dateSubmitted,
                                 submittedBy,
                                 description
@@ -221,7 +232,7 @@ public class TicketController {
             String dateSubmitted = parts[7].trim();
 
             //put filers condition
-            if (!filterCondition.test(parts)) continue;
+            if (!filterCondition.test(parts)) { continue; }
 
             //ticket row builder from loadTicketsFromFile
             //create ticket row
@@ -283,6 +294,8 @@ public class TicketController {
                             subject,
                             status,
                             dateSubmitted,
+                            priority,
+                            assignedAgent,
                             submittedBy,
                             description
                     );
@@ -390,6 +403,8 @@ public class TicketController {
                             subject,
                             status,
                             dateSubmitted,
+                            priority,
+                            assignedAgent,
                             submittedBy,
                             description
                     );
@@ -497,6 +512,8 @@ public class TicketController {
                             subject,
                             status,
                             dateSubmitted,
+                            priority,
+                            assignedAgent,
                             submittedBy,
                             description
                     );
@@ -519,7 +536,7 @@ public class TicketController {
     //sets TicketSorterController as the parent to allow functions to pass
     public void setParent(TicketSorterController parent) {
         this.parentController = parent;
-        System.out.println("Parent controller set!");
+        //System.out.println("Parent controller set!");
     }
 
     // to make so that the status is displayed as a symbol instead of text

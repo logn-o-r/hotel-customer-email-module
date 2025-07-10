@@ -1,5 +1,6 @@
 package apassignment.ticketingsystem;
 
+import apassignment.util.UserSession;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -29,6 +30,8 @@ import java.util.logging.Logger;
 
 public class TicketDetailController implements Initializable {
 
+    private String currentLoggedUserID = UserSession.getCurrentUserID();
+
     @FXML
     private Label ticektSubjectTitle;
     @FXML
@@ -54,6 +57,8 @@ public class TicketDetailController implements Initializable {
     private Button addResponseButton;
 
     private String ticketID;
+    private String ticketPriority;
+    private String agent;
 
     private String ticketStatus;
 
@@ -62,7 +67,7 @@ public class TicketDetailController implements Initializable {
     private Pane parentContainer;
 
 
-    public void setTicketDetails(String id, String subject, String status, String createdDate, String userId, String description) {
+    public void setTicketDetails(String id, String subject, String status, String createdDate, String priority, String assignedAgent, String userID, String description) {
 
         this.ticketID = id;
         //sets the title of ticekt to the ticket's subject
@@ -81,8 +86,11 @@ public class TicketDetailController implements Initializable {
         //sets the date it was created
         dateCreated.setText("Created on : " + createdDate);
 
+        this.ticketPriority = priority;
+        this.agent = assignedAgent;
+
         //sets the user who created the ticket
-        userSubmitted.setText("Submitted by : " + userId);
+        userSubmitted.setText("Submitted by : " + userID);
 
         //sets the description of ticket
         Text desx = new Text(description);
@@ -91,6 +99,9 @@ public class TicketDetailController implements Initializable {
 
         //if ticket is closed, no button to close the ticket
         if(status.equalsIgnoreCase("Closed") && (ticketCloseButton != null)) {
+            ticketCloseButton.setVisible(false);
+            ticketCloseButton.setManaged(false);
+        } else if (!assignedAgent.equals(currentLoggedUserID)) {
             ticketCloseButton.setVisible(false);
             ticketCloseButton.setManaged(false);
         }
@@ -149,13 +160,26 @@ public class TicketDetailController implements Initializable {
 
         }
 
-        // Check if last user who responded was an agent
-        if (lastUser.startsWith("AGT") && (ticketCloseButton != null)) {
+        // Check if last user who responded was an agent and current logged-in user is a customer
+        if (lastUser.startsWith("AGT") && (ticketCloseButton != null) && (currentLoggedUserID.startsWith("CUST")) && (!ticketStatus.equals("Closed"))) {
             addResponseButton.setVisible(true);
             addResponseButton.setManaged(true);
-        } else {
+        }
+        else {
             addResponseButton.setVisible(false);
             addResponseButton.setManaged(false);
+        }
+        //so agents can reply to customers or newly submitted tickets after claim
+        if (currentLoggedUserID.equals(agent)) {
+            if ((lastUser.startsWith("CUST") || lastUser.equals(""))) {
+                if ((!ticketStatus.equals("Closed")) && (currentLoggedUserID.startsWith("AGT")) && ((ticketCloseButton != null))) {
+                    addResponseButton.setVisible(true);
+                    addResponseButton.setManaged(true);
+                } else {
+                    addResponseButton.setVisible(false);
+                    addResponseButton.setManaged(false);
+                }
+            }
         }
     }
 
@@ -171,12 +195,12 @@ public class TicketDetailController implements Initializable {
         String content = responseText.getText().trim();
         if (content.isEmpty()) return;
 
-        String responderID = "CUST001"; // note: replace with currently logged in userID
+        String responderID = currentLoggedUserID;
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("response.txt", true))) {
             writer.write("\n"+ticketID + " | " + responderID + " | " + content + " | " + date);
-            writer.newLine();
+            //writer.newLine();
         } catch (IOException e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to submit response.", e);
 
@@ -254,6 +278,8 @@ public class TicketDetailController implements Initializable {
                 ticektSubjectTitle.getText(),
                 "Closed",
                 dateCreated.getText().replace("Created on : ", ""),
+                ticketPriority,
+                agent,
                 userSubmitted.getText().replace("Submitted by : ", ""),
                 ((Text) descriptionContainer.getChildren().get(0)).getText()
         );

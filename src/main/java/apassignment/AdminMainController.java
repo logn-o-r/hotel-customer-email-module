@@ -1,23 +1,22 @@
 package apassignment;
 
-import javafx.scene.control.Alert;
-import javafx.scene.layout.VBox;
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.fontawesome.FontAwesome;
-import javafx.scene.paint.Color;
+import apassignment.util.UserSession;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import org.kordamp.ikonli.fontawesome.FontAwesome;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import apassignment.util.UserSession;
-
-public class MainController {
+public class AdminMainController {
 
     private String currentLoggedUserID;
 
@@ -29,6 +28,8 @@ public class MainController {
     @FXML
     private Label dashboardIcon;
     @FXML
+    private Label usermanagementIcon;
+    @FXML
     private Label ticketIcon;
     @FXML
     private Label faqIcon;
@@ -38,9 +39,17 @@ public class MainController {
     private Label emailIcon;
 
     @FXML
+    private VBox usermanagementIconContainer;
+    @FXML
+    private Label manageIconLabel;
+    @FXML
+    private Label userIconLabel;
+
+    @FXML
     public void initialize() {
         //To set icons
         setIcon(dashboardIcon, FontAwesome.HOME);
+        setIcon(usermanagementIcon, FontAwesome.USERS);
         setIcon(ticketIcon, FontAwesome.TICKET);
         setIcon(faqIcon, FontAwesome.QUESTION_CIRCLE);
         setIcon(chatIcon, FontAwesome.COMMENTS);
@@ -48,8 +57,16 @@ public class MainController {
 
         currentLoggedUserID = UserSession.getCurrentUserID();
 
+        // hide Manage User button for customer and agent as only admin should have access
+        if (currentLoggedUserID != null && (currentLoggedUserID.startsWith("CUST") || currentLoggedUserID.startsWith("AGT"))) {
+            usermanagementIcon.setVisible(false);
+            manageIconLabel.setVisible(false);
+            userIconLabel.setVisible(false);
+        }
+
         //Set click handlers (to make the label icons into buttons)
-        //dashboardIcon.setOnMouseClicked(e -> loadView("Dashboard.fxml"));TicketSorter.fxml
+        //dashboardIcon.setOnMouseClicked(e -> loadView("Dashboard.fxml"));
+        usermanagementIcon.setOnMouseClicked(e -> loadView("/apassignment/fxml/usermanagement/management.fxml"));
         ticketIcon.setOnMouseClicked(e -> loadView("/apassignment/fxml/ticketingsystem/TicketSorter.fxml"));
         //faqIcon.setOnMouseClicked(e -> loadView("FAQ.fxml"));
         //chatIcon.setOnMouseClicked(e -> loadView("LiveChat.fxml"));

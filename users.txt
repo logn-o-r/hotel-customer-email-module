@@ -1,1 +1,4 @@
-maria,451792,mk23@gmail.com,12345678,Guest
+maria,CUST001,mk23@gmail.com,12345678,Customer
+admin,ADM002,imaan@gmail.com,adm123,Admin
+agent,AGT003,boss@gmail.com,agt123,Agent
+user,CUST007,kono@gmail.com,cust123,Customer

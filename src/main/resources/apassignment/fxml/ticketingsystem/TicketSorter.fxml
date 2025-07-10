@@ -17,11 +17,14 @@
             <Button layoutX="113.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleSearch" text="Search" />
             <VBox alignment="CENTER" layoutX="15.0" layoutY="39.0" prefHeight="180.0" prefWidth="149.0" spacing="15.0">
                <children>
-                  <Button mnemonicParsing="false" onAction="#handleMyTickets" prefHeight="25.0" prefWidth="82.0" text="My Tickets" />
+                  <Button fx:id="myTicketButtom" mnemonicParsing="false" onAction="#handleMyTickets" prefHeight="25.0" prefWidth="82.0" text="My Tickets" />
                   <Line endX="15.333343505859375" endY="1.52587890625E-5" startX="-100.0" />
                   <Button mnemonicParsing="false" onAction="#handleOpenTickets" prefHeight="25.0" prefWidth="82.0" text="Open" />
                   <Button mnemonicParsing="false" onAction="#handleInProgressTickets" prefHeight="25.0" prefWidth="82.0" text="In-Porgress" />
                   <Button mnemonicParsing="false" onAction="#handleClosedTickets" prefHeight="25.0" prefWidth="82.0" text="Closed" />
+                  <Line endX="15.333343505859375" endY="1.52587890625E-5" startX="-100.0" />
+                  <Button fx:id="unclaimedTicketsButton" disable="true" mnemonicParsing="false" onAction="#handleUnclaimedTickets" prefHeight="25.0" prefWidth="82.0" text="Unclaimed" visible="false" />
+                  <Button fx:id="myTicketButtomAgent" disable="true" mnemonicParsing="false" onAction="#handleMyTicketsAgent" prefHeight="25.0" prefWidth="82.0" text="All Tickets" visible="false" />
                </children>
                <padding>
                   <Insets top="15.0" />

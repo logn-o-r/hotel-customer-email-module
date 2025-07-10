@@ -59,7 +59,7 @@ public class newTicketController {
         String ticketID = generateUniqueTicketID();
         String status = "Open";
         String priority = "Low";
-        String assignedAgent = "null";
+        String assignedAgent = "none";
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
         String ticketLine = ticketID + " | " + subject+ " | " + status + " | " + description + " | " + priority + " | " + assignedAgent + " | " + submittedByUserID + " | " + date;
@@ -95,9 +95,14 @@ public class newTicketController {
         try {
             List<String> lines = Files.readAllLines(Paths.get("ticket.txt"));
             int maxId = lines.stream()
+                    //splits the line by | symbol and takes the first part assuming ticektID is the first variable
+                    // it removes any leading/trailing whitespace then removes the TCK prefix
+                    //leaving the nummeric part
                     .map(line -> line.split("\\|")[0].trim().replace("TCK", ""))
+                    //then ensures only valid numeric IDs are passed/filters the stream to keep only the strings that are pure digits
                     .filter(id -> id.matches("\\d+"))
                     .mapToInt(Integer::parseInt)
+                    //finds the largest code/highest userID, if it has no max, returns 0
                     .max().orElse(0);
             return String.format("TCK%03d", maxId + 1);
         } catch (IOException e) {
