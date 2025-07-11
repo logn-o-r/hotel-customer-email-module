@@ -17,7 +17,7 @@
     <AnchorPane fx:id="ticketDetailsContainer" minHeight="0.0" minWidth="680.0" prefWidth="690.0">
          <children>
             <Button fx:id="backButton" layoutX="15.0" layoutY="26.0" mnemonicParsing="false" text="Back" />
-            <Label fx:id="ticektSubjectTitle" layoutX="80.0" layoutY="24.0" maxWidth="320.0" prefHeight="30.0" text="Ticket Subject">
+            <Label fx:id="ticektSubjectTitle" layoutX="80.0" layoutY="24.0" maxWidth="290.0" prefHeight="30.0" text="Ticket Subject">
                <font>
                   <Font name="System Bold" size="20.0" />
                </font>
@@ -69,7 +69,8 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>
             </VBox>
-            <ChoiceBox fx:id="priorityBox" layoutX="408.0" layoutY="27.0" prefHeight="25.0" />
+            <ChoiceBox fx:id="priorityBox" layoutX="378.0" layoutY="27.0" maxWidth="80.0" prefHeight="25.0" prefWidth="80.0" />
+            <HBox fx:id="priorityIconContainer" alignment="CENTER_LEFT" layoutX="464.0" layoutY="27.0" prefHeight="25.0" prefWidth="19.0" />
          </children></AnchorPane>
   </content>
 </ScrollPane>

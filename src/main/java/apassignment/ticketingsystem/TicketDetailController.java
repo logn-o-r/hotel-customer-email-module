@@ -67,6 +67,8 @@ public class TicketDetailController implements Initializable {
     //for ticket priority dropdown menu
     @FXML
     private ChoiceBox<String> priorityBox;
+    @FXML
+    private HBox priorityIconContainer;
 
     //for admin to assign tickets to agents
     @FXML
@@ -118,8 +120,17 @@ public class TicketDetailController implements Initializable {
         //sets the current priority for ticket
         this.ticketPriority = priority;
         priorityBox.setValue(priority);
+        FontIcon priorityIcon = getPriorityIcons(priority);
+        priorityIcon.setIconSize(20);
+        priorityIconContainer.getChildren().add(priorityIcon);
 
+        //sets the agents assigned to ticket (admin only)
         this.agent = assignedAgent;
+        if(agent.equals("Unassigned")) {
+            assignAgentChoice.setValue(agent);
+        } else  {
+        assignAgentChoice.setValue(agent + " : " + getUsernameByUserID(agent)); }
+
 
         //sets the user who created the ticket
         userSubmitted.setText("Submitted by : " + userID);
@@ -139,7 +150,14 @@ public class TicketDetailController implements Initializable {
         }
 
         //role base access
-        if (status.equals("Open") && currentLoggedUserID.startsWith("AGT") && agent.equals("Unassigned")) {
+        boolean isAgent = currentLoggedUserID.startsWith("AGT");
+        boolean isAdmin = currentLoggedUserID.startsWith("ADM");
+        boolean isAssignedAgent = currentLoggedUserID.equals(agent);
+        boolean isUnassigned = agent.equalsIgnoreCase("Unassigned");
+        boolean isClosed = status.equalsIgnoreCase("Closed");
+
+        //show claim ticket button if current user is an agent and the ticket has no assigned agent
+        if (isAgent && isUnassigned) {
            claimTicketButton.setVisible(true);
            claimTicketButton.setManaged(true);
         } else {
@@ -147,39 +165,39 @@ public class TicketDetailController implements Initializable {
             claimTicketButton.setManaged(false);
         }
 
-        if (currentLoggedUserID.startsWith("ADM") || currentLoggedUserID.startsWith("AGT")) {
+        //if admin views a closed ticket, it will show who was last assigned the ticket when it is closed
+        if(isAdmin && isClosed){
+            if(isUnassigned){
+                ticketsAssignedAgentLabel.setText("Assigned Agent: Unassigned");
+            } else {
+                ticketsAssignedAgentLabel.setText("Assigned Agent: " + getUsernameByUserID(agent) + ", " + agent);
+                assignAgentChoice.setVisible(false);
+                assignAgentChoice.setDisable(true); }
+        }
+        //only shows priority box when:
+        //for both admin and agents: ticket is not closed
+        //for agents: if it is assigned to them
+        if ((isAdmin && !isClosed) || (isAgent && isAssignedAgent && !isClosed)) {
+            priorityBox.setVisible(true);
+            priorityBox.setDisable(false);
+            priorityBox.getItems().clear();
             priorityBox.getItems().addAll("Low", "Medium", "High");
 
             // listener to save changes
             priorityBox.setOnAction(e -> {
-                if(status.equals("Closed")){
-                    priorityBox.setVisible(false);
-                    priorityBox.setDisable(true);
-                } else {
-                    priorityBox.setVisible(true);
-                    priorityBox.setDisable(false);
-                }
                 String selectedPriority = priorityBox.getValue();
                 if (selectedPriority != null && !selectedPriority.isEmpty()) {
                     updateTicketPriority(ticketID, selectedPriority);
+                    reloadTicketDetails();
                 }
             });
 
-            if (currentLoggedUserID.startsWith("ADM")) {
+            //only admins get to see and use the assign agent button and if the ticket is not closed
+            if (isAdmin) {
                 ticketsAssignedAgentLabel.setVisible(true);
-                if(status.equals("Closed")){
-                    if(agent.equals("Unassigned")){
-                        ticketsAssignedAgentLabel.setText("Assigned Agent: Unassigned");
-                    } else {
-                    ticketsAssignedAgentLabel.setText("Assigned Agent: " + getUsernameByUserID(agent) + ", " + agent); }
-                    assignAgentChoice.setVisible(false);
-                    assignAgentChoice.setDisable(true);
-                } else {
-                    assignAgentChoice.setVisible(true);
-                    assignAgentChoice.setDisable(false);
-                    assignAgentChoice.setPrefWidth(250);
-                }
-
+                assignAgentChoice.setVisible(true);
+                assignAgentChoice.setDisable(false);
+                assignAgentChoice.setPrefWidth(250);
                 assignAgentChoice.getItems().clear();
 
                 // adds all active agent accounts to choice box
@@ -201,7 +219,7 @@ public class TicketDetailController implements Initializable {
                 }
 
                 // Set current agent as selected (if not unassigned)
-                if (agent != null && !agent.isEmpty() && !agent.equalsIgnoreCase("Unassigned")) {
+                if (agent != null && !agent.isEmpty() && !isUnassigned) {
                     String agentUsername = getUsernameByUserID(agent);
                     assignAgentChoice.setValue(agent + " : " + agentUsername);
                 }
@@ -212,9 +230,18 @@ public class TicketDetailController implements Initializable {
                     if (selected != null && !selected.isEmpty()) {
                         String selectedAgentID = selected.split(" : ")[0].trim(); // extract userID
                         updateAssignedAgent(ticketID, selectedAgentID);
+                        this.agent = selectedAgentID;
+                        reloadTicketDetails();
                     }
                 });
+            } else {
+                ticketsAssignedAgentLabel.setVisible(false);
+                assignAgentChoice.setVisible(false);
+                assignAgentChoice.setDisable(true);
             }
+        } else {
+            priorityBox.setVisible(false);
+            priorityBox.setDisable(true);
         }
 
         //load responses to ticket
@@ -304,8 +331,10 @@ public class TicketDetailController implements Initializable {
     @FXML
     private void handleClaimTicketAgent() {
         updateAssignedAgent(ticketID, currentLoggedUserID);
+        this.agent = currentLoggedUserID;
         claimTicketButton.setVisible(false);
         claimTicketButton.setManaged(false);
+        reloadTicketDetails();
     }
 
     @FXML
@@ -355,6 +384,30 @@ public class TicketDetailController implements Initializable {
             default:
                 iconView = new FontIcon(FontAwesome.QUESTION_CIRCLE);
                 iconView.setIconColor(Color.RED);
+                break;
+        }
+        return iconView;
+    }
+
+    //turns makes the corresponding icon for the priority of ticket
+    private FontIcon getPriorityIcons(String priority) {
+        FontIcon iconView;
+        switch (priority.toLowerCase()) {
+            case "high":
+                iconView = new FontIcon(FontAwesome.EXCLAMATION_CIRCLE);
+                iconView.setIconColor(Color.RED);
+                break;
+            case "medium":
+                iconView = new FontIcon(FontAwesome.EXCLAMATION_CIRCLE);
+                iconView.setIconColor(Color.ORANGE);
+                break;
+            case "low":
+                iconView = new FontIcon(FontAwesome.EXCLAMATION_CIRCLE);
+                iconView.setIconColor(Color.GREEN);
+                break;
+            default:
+                iconView = new FontIcon(FontAwesome.QUESTION_CIRCLE);
+                iconView.setIconColor(Color.BLUE);
                 break;
         }
         return iconView;
@@ -452,13 +505,6 @@ public class TicketDetailController implements Initializable {
 
             Files.write(filePath, updatedLines, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
 
-            // show confirmation
-//            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-//            alert.setTitle("Success");
-//            alert.setHeaderText("Priority Updated");
-//            alert.setContentText("The ticket's priority has been updated to " + newPriority + ".");
-//            alert.showAndWait();
-
         } catch (IOException e) {
             e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -496,6 +542,9 @@ public class TicketDetailController implements Initializable {
 
     //retrives the username attached to the userID
     public String getUsernameByUserID(String userID) {
+        if (userID.equals("Unassigned")) {
+            return userID;
+        }
         try (BufferedReader br = new BufferedReader(new FileReader("users.txt"))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -510,5 +559,17 @@ public class TicketDetailController implements Initializable {
         return "Unknown"; // default if userID is not found
     }
 
+    private void reloadTicketDetails() {
+        parentController.showTicketDetails(
+                ticketID,
+                ticektSubjectTitle.getText(),
+                ticketStatus,
+                dateCreated.getText().replace("Created on : ", ""),
+                priorityBox.getValue(),  // latest priority
+                agent,  // newly assigned agent
+                userSubmitted.getText().replace("Submitted by : ", ""),
+                ((Text) descriptionContainer.getChildren().get(0)).getText()
+        );
+    }
 
 }
