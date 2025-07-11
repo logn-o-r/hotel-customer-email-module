@@ -28,27 +28,29 @@
       </HBox>
       <GridPane hgap="10.0">
         <columnConstraints>
-          <ColumnConstraints hgrow="NEVER" prefWidth="180.0" />
-          <ColumnConstraints hgrow="NEVER" prefWidth="100.0" />
-            <ColumnConstraints hgrow="ALWAYS" prefWidth="100.0" />
-            <ColumnConstraints hgrow="NEVER" prefWidth="50.0" />
+          <ColumnConstraints hgrow="NEVER" prefWidth="130.0" />
+          <ColumnConstraints hgrow="NEVER" prefWidth="40.0" />
+            <ColumnConstraints fillWidth="false" hgrow="ALWAYS" prefWidth="200.0" />
+            <ColumnConstraints hgrow="NEVER" prefWidth="60.0" />
+            <ColumnConstraints hgrow="NEVER" minWidth="-Infinity" prefWidth="130.0" />
         </columnConstraints>
         <rowConstraints>
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Label prefWidth="180.0" text="Subject" GridPane.hgrow="NEVER" />
+            <Label prefHeight="17.0" prefWidth="120.0" text="Subject" GridPane.hgrow="NEVER" />
             <Label prefWidth="100.0" text="Status" GridPane.columnIndex="1" GridPane.hgrow="NEVER" />
             <Label text="Description" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" />
-            <Label prefWidth="50.0" GridPane.columnIndex="3" GridPane.hgrow="NEVER" />
+            <Label fx:id="priorityLabel" prefWidth="50.0" text="Priority" visible="false" GridPane.columnIndex="3" GridPane.hgrow="NEVER" />
+            <Label fx:id="assignedAgentLabel" text="Assigned Agent" visible="false" GridPane.columnIndex="4" />
          </children>
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" />
          </padding>
       </GridPane>
-       <ScrollPane fitToWidth="true" prefHeight="583.0" prefWidth="709.0">
+       <ScrollPane fitToWidth="true" prefHeight="583.0" prefWidth="660.0">
            <content>
-               <VBox fx:id="ticketContainer" maxWidth="Infinity" prefWidth="Infinity" spacing="10.0" />
+               <VBox fx:id="ticketContainer" alignment="TOP_CENTER" fillWidth="false" minWidth="640.0" spacing="10.0" />
            </content>
        </ScrollPane>
    </children>

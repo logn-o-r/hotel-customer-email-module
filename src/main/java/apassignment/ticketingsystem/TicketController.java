@@ -6,7 +6,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -14,8 +14,6 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.fontawesome.FontAwesome;
 import javafx.scene.paint.Color;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -42,6 +40,11 @@ public class TicketController {
 
     @FXML
     Button newTicketButton;
+
+    @FXML
+    private Label assignedAgentLabel;
+    @FXML
+    private Label priorityLabel;
 
     private String currentUserID = UserSession.getCurrentUserID();
 
@@ -97,65 +100,85 @@ public class TicketController {
 
                 //create ticket row
                 GridPane ticektRow = new GridPane();
+                ticektRow.setPrefWidth(640); // Fixed width for row
+                ticektRow.setMaxWidth(640);
+                ticektRow.setMinWidth(640);
                 ticektRow.setHgap(10);
                 ticektRow.setVgap(5);
                 ticektRow.setPadding(new Insets(5));
                 ticektRow.setStyle("-fx-border-color: gray; -fx-background-color: #FFFFFF;");
 
                 //for alignment text
-                ColumnConstraints col1 = new ColumnConstraints();
-                col1.setMinWidth(180); // subject label
-                ColumnConstraints col2 = new ColumnConstraints();
-                col2.setMinWidth(100); // status Icon
+                ColumnConstraints col1 = new ColumnConstraints(120);// subject label
+                ColumnConstraints col2 = new ColumnConstraints(40);// status Icon
                 ColumnConstraints col3 = new ColumnConstraints();
                 col3.setHgrow(Priority.ALWAYS); // description label (expandable)
-                ColumnConstraints col4 = new ColumnConstraints();
+                ColumnConstraints col4 = new ColumnConstraints(180); //priority + assigned agent + arrow
                 col4.setMinWidth(50); // arrow to view ticket
                 ticektRow.getColumnConstraints().addAll(col1, col2, col3, col4);
 
                 //subject of ticket
                 Label subjectLabel = new Label(subject);
-                subjectLabel.setMaxWidth(180);
-                HBox.setHgrow(subjectLabel, Priority.NEVER);
+                subjectLabel.setMaxWidth(120);
+                subjectLabel.setWrapText(false);
+                subjectLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
 
                 //status of ticket as a symbol using fontawesome
                 FontIcon statusIcon = getStatusIcons(finalStatus);
-                statusIcon.setIconSize(16);
-                statusIcon.setIconColor(Color.BLACK);
-                // Wrap status in an HBox for consistent layout
-                HBox statusBox = new HBox(statusIcon);
-                statusBox.setAlignment(Pos.CENTER_LEFT);
-                statusBox.setPrefWidth(100);
+                HBox statusBox = new HBox(statusIcon); //wraps icon in a hbox for a consistant layout
+                statusBox.setAlignment(Pos.CENTER);
+                statusBox.setMinWidth(30);
 
                 //description of ticket
                 Label descLabel = new Label(description);
-                descLabel.setWrapText(true);
-                descLabel.setMaxWidth(Double.MAX_VALUE);
-                HBox.setHgrow(descLabel, Priority.NEVER);
+                descLabel.setWrapText(false);
+                descLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
+                descLabel.setTooltip(new Tooltip(description));
 
-                //space to push arrow button to the far right
-                Region space = new Region();
-                HBox.setHgrow(space, Priority.ALWAYS);
+                // right side : (priorty + assigned agent) + view button
+                HBox rightBox = new HBox(5);
+                rightBox.setAlignment(Pos.CENTER_RIGHT);
 
-                //to create the arrow icon for the 'view the ticket' button
+                //show priority and assigned agent only if agent or admin
+                if (currentUserID.startsWith("ADM") || currentUserID.startsWith("AGT")) {
+                    //header for priority and assigned agent
+                    assignedAgentLabel.setVisible(true);
+                    priorityLabel.setVisible(true);
+
+                    //to stop description from overruning
+                    descLabel.setMaxWidth(200);
+                    // Priority
+                    FontIcon priorityIcon = getPriorityIcon(priority); // (Your method to return color/icon)
+                    Label priorityLabel = new Label(priority, priorityIcon);
+                    priorityLabel.setStyle("-fx-font-weight: bold;");
+                    priorityLabel.setMinWidth(60);
+
+                    // Assigned agent, using button as a box
+                    Button agentBtn = new Button(assignedAgent);
+                    agentBtn.setStyle("-fx-background-color: black; -fx-text-fill: white;");
+                    agentBtn.setMinWidth(80);
+
+                    rightBox.getChildren().addAll(priorityLabel, agentBtn);
+                }
+
+                // ticekt view button
+                Button viewButton = new Button();
                 FontIcon arrowIcon = new FontIcon(FontAwesome.ARROW_RIGHT);
                 arrowIcon.setIconSize(16);
                 arrowIcon.setIconColor(Color.BLACK);
-                //Creating the button for the arrow
-                Button viewButton = new Button();
                 viewButton.setGraphic(arrowIcon);
-                viewButton.setMinWidth(50);
-                HBox.setHgrow(viewButton, Priority.NEVER);
+                viewButton.setMinWidth(30);
+                rightBox.getChildren().add(viewButton);
 
                 viewButton.setOnAction(e -> {
                     if (parentController != null) {
                         parentController.showTicketDetails(
                                 id,
                                 subject,
-                                finalStatus,
+                                status,
+                                dateSubmitted,
                                 priority,
                                 assignedAgent,
-                                dateSubmitted,
                                 submittedBy,
                                 description
                         );
@@ -164,13 +187,13 @@ public class TicketController {
                     }
                 });
 
-                ticektRow.add(subjectLabel, 0, 0);  // Column 0
-                ticektRow.add(statusBox, 1, 0);     // Column 1
-                ticektRow.add(descLabel, 2, 0);     // Column 2
-                ticektRow.add(viewButton, 3, 0);    // Column 3
+                ticektRow.add(subjectLabel, 0, 0);  // column 0
+                ticektRow.add(statusBox, 1, 0);     // column 1
+                ticektRow.add(descLabel, 2, 0);     // column 2
+                ticektRow.add(rightBox, 3, 0);      // column 4
+
 
                 ticketContainer.getChildren().add(ticektRow);
-
             }
 
         }
@@ -237,55 +260,75 @@ public class TicketController {
             //ticket row builder from loadTicketsFromFile
             //create ticket row
             GridPane ticektRow = new GridPane();
+            ticektRow.setPrefWidth(640); // Fixed width for row
+            ticektRow.setMaxWidth(640);
+            ticektRow.setMinWidth(640);
             ticektRow.setHgap(10);
             ticektRow.setVgap(5);
             ticektRow.setPadding(new Insets(5));
             ticektRow.setStyle("-fx-border-color: gray; -fx-background-color: #FFFFFF;");
 
             //for alignment text
-            ColumnConstraints col1 = new ColumnConstraints();
-            col1.setMinWidth(180); // subject label
-            ColumnConstraints col2 = new ColumnConstraints();
-            col2.setMinWidth(100); // status Icon
+            ColumnConstraints col1 = new ColumnConstraints(120);// subject label
+            ColumnConstraints col2 = new ColumnConstraints(40);// status Icon
             ColumnConstraints col3 = new ColumnConstraints();
             col3.setHgrow(Priority.ALWAYS); // description label (expandable)
-            ColumnConstraints col4 = new ColumnConstraints();
+            ColumnConstraints col4 = new ColumnConstraints(180); //priority + assigned agent + arrow
             col4.setMinWidth(50); // arrow to view ticket
             ticektRow.getColumnConstraints().addAll(col1, col2, col3, col4);
 
             //subject of ticket
             Label subjectLabel = new Label(subject);
-            subjectLabel.setMaxWidth(180);
-            HBox.setHgrow(subjectLabel, Priority.NEVER);
+            subjectLabel.setMaxWidth(120);
+            subjectLabel.setWrapText(false);
+            subjectLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
 
             //status of ticket as a symbol using fontawesome
             FontIcon statusIcon = getStatusIcons(status);
-            statusIcon.setIconSize(16);
-            statusIcon.setIconColor(Color.BLACK);
-            // Wrap status in an HBox for consistent layout
-            HBox statusBox = new HBox(statusIcon);
-            statusBox.setAlignment(Pos.CENTER_LEFT);
-            statusBox.setPrefWidth(100);
+            HBox statusBox = new HBox(statusIcon); //wraps icon in a hbox for a consistant layout
+            statusBox.setAlignment(Pos.CENTER);
+            statusBox.setMinWidth(30);
 
             //description of ticket
             Label descLabel = new Label(description);
-            descLabel.setWrapText(true);
-            descLabel.setMaxWidth(Double.MAX_VALUE);
-            HBox.setHgrow(descLabel, Priority.NEVER);
+            descLabel.setWrapText(false);
+            descLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
+            descLabel.setTooltip(new Tooltip(description));
 
-            //space to push arrow button to the far right
-            Region space = new Region();
-            HBox.setHgrow(space, Priority.ALWAYS);
+            // right side : (priorty + assigned agent) + view button
+            HBox rightBox = new HBox(5);
+            rightBox.setAlignment(Pos.CENTER_RIGHT);
 
-            //to create the arrow icon for the 'view the ticket' button
+            //show priority and assigned agent only if agent or admin
+            if (currentUserID.startsWith("ADM") || currentUserID.startsWith("AGT")) {
+                //header for priority and assigned agent
+                assignedAgentLabel.setVisible(true);
+                priorityLabel.setVisible(true);
+
+                //to stop description from overruning
+                descLabel.setMaxWidth(200);
+                // Priority
+                FontIcon priorityIcon = getPriorityIcon(priority); // (Your method to return color/icon)
+                Label priorityLabel = new Label(priority, priorityIcon);
+                priorityLabel.setStyle("-fx-font-weight: bold;");
+                priorityLabel.setMinWidth(60);
+
+                // Assigned agent, using button as a box
+                Button agentBtn = new Button(assignedAgent);
+                agentBtn.setStyle("-fx-background-color: black; -fx-text-fill: white;");
+                agentBtn.setMinWidth(80);
+
+                rightBox.getChildren().addAll(priorityLabel, agentBtn);
+            }
+
+            // ticekt view button
+            Button viewButton = new Button();
             FontIcon arrowIcon = new FontIcon(FontAwesome.ARROW_RIGHT);
             arrowIcon.setIconSize(16);
             arrowIcon.setIconColor(Color.BLACK);
-            //Creating the button for the arrow
-            Button viewButton = new Button();
             viewButton.setGraphic(arrowIcon);
-            viewButton.setMinWidth(50);
-            HBox.setHgrow(viewButton, Priority.NEVER);
+            viewButton.setMinWidth(30);
+            rightBox.getChildren().add(viewButton);
 
             viewButton.setOnAction(e -> {
                 if (parentController != null) {
@@ -304,12 +347,11 @@ public class TicketController {
                 }
             });
 
+            ticektRow.add(subjectLabel, 0, 0);  // column 0
+            ticektRow.add(statusBox, 1, 0);     // column 1
+            ticektRow.add(descLabel, 2, 0);     // column 2
+            ticektRow.add(rightBox, 3, 0);      // column 4
 
-
-            ticektRow.add(subjectLabel, 0, 0);  // Column 0
-            ticektRow.add(statusBox, 1, 0);     // Column 1
-            ticektRow.add(descLabel, 2, 0);     // Column 2
-            ticektRow.add(viewButton, 3, 0);    // Column 3
 
             ticketContainer.getChildren().add(ticektRow);
         }
@@ -346,55 +388,75 @@ public class TicketController {
             //ticket row builder from loadTicketsFromFile
             //create ticket row
             GridPane ticektRow = new GridPane();
+            ticektRow.setPrefWidth(640); // Fixed width for row
+            ticektRow.setMaxWidth(640);
+            ticektRow.setMinWidth(640);
             ticektRow.setHgap(10);
             ticektRow.setVgap(5);
             ticektRow.setPadding(new Insets(5));
             ticektRow.setStyle("-fx-border-color: gray; -fx-background-color: #FFFFFF;");
 
             //for alignment text
-            ColumnConstraints col1 = new ColumnConstraints();
-            col1.setMinWidth(180); // subject label
-            ColumnConstraints col2 = new ColumnConstraints();
-            col2.setMinWidth(100); // status Icon
+            ColumnConstraints col1 = new ColumnConstraints(120);// subject label
+            ColumnConstraints col2 = new ColumnConstraints(40);// status Icon
             ColumnConstraints col3 = new ColumnConstraints();
             col3.setHgrow(Priority.ALWAYS); // description label (expandable)
-            ColumnConstraints col4 = new ColumnConstraints();
+            ColumnConstraints col4 = new ColumnConstraints(180); //priority + assigned agent + arrow
             col4.setMinWidth(50); // arrow to view ticket
             ticektRow.getColumnConstraints().addAll(col1, col2, col3, col4);
 
             //subject of ticket
             Label subjectLabel = new Label(subject);
-            subjectLabel.setMaxWidth(180);
-            HBox.setHgrow(subjectLabel, Priority.NEVER);
+            subjectLabel.setMaxWidth(120);
+            subjectLabel.setWrapText(false);
+            subjectLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
 
             //status of ticket as a symbol using fontawesome
             FontIcon statusIcon = getStatusIcons(status);
-            statusIcon.setIconSize(16);
-            statusIcon.setIconColor(Color.BLACK);
-            // Wrap status in an HBox for consistent layout
-            HBox statusBox = new HBox(statusIcon);
-            statusBox.setAlignment(Pos.CENTER_LEFT);
-            statusBox.setPrefWidth(100);
+            HBox statusBox = new HBox(statusIcon); //wraps icon in a hbox for a consistant layout
+            statusBox.setAlignment(Pos.CENTER);
+            statusBox.setMinWidth(30);
 
             //description of ticket
             Label descLabel = new Label(description);
-            descLabel.setWrapText(true);
-            descLabel.setMaxWidth(Double.MAX_VALUE);
-            HBox.setHgrow(descLabel, Priority.NEVER);
+            descLabel.setWrapText(false);
+            descLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
+            descLabel.setTooltip(new Tooltip(description));
 
-            //space to push arrow button to the far right
-            Region space = new Region();
-            HBox.setHgrow(space, Priority.ALWAYS);
+            // right side : (priorty + assigned agent) + view button
+            HBox rightBox = new HBox(5);
+            rightBox.setAlignment(Pos.CENTER_RIGHT);
 
-            //to create the arrow icon for the 'view the ticket' button
+            //show priority and assigned agent only if agent or admin
+            if (currentUserID.startsWith("ADM") || currentUserID.startsWith("AGT")) {
+                //header for priority and assigned agent
+                assignedAgentLabel.setVisible(true);
+                priorityLabel.setVisible(true);
+
+                //to stop description from overruning
+                descLabel.setMaxWidth(200);
+                // Priority
+                FontIcon priorityIcon = getPriorityIcon(priority); // (Your method to return color/icon)
+                Label priorityLabel = new Label(priority, priorityIcon);
+                priorityLabel.setStyle("-fx-font-weight: bold;");
+                priorityLabel.setMinWidth(60);
+
+                // Assigned agent, using button as a box
+                Button agentBtn = new Button(assignedAgent);
+                agentBtn.setStyle("-fx-background-color: black; -fx-text-fill: white;");
+                agentBtn.setMinWidth(80);
+
+                rightBox.getChildren().addAll(priorityLabel, agentBtn);
+            }
+
+            // ticekt view button
+            Button viewButton = new Button();
             FontIcon arrowIcon = new FontIcon(FontAwesome.ARROW_RIGHT);
             arrowIcon.setIconSize(16);
             arrowIcon.setIconColor(Color.BLACK);
-            //Creating the button for the arrow
-            Button viewButton = new Button();
             viewButton.setGraphic(arrowIcon);
-            viewButton.setMinWidth(50);
-            HBox.setHgrow(viewButton, Priority.NEVER);
+            viewButton.setMinWidth(30);
+            rightBox.getChildren().add(viewButton);
 
             viewButton.setOnAction(e -> {
                 if (parentController != null) {
@@ -413,12 +475,11 @@ public class TicketController {
                 }
             });
 
+            ticektRow.add(subjectLabel, 0, 0);  // column 0
+            ticektRow.add(statusBox, 1, 0);     // column 1
+            ticektRow.add(descLabel, 2, 0);     // column 2
+            ticektRow.add(rightBox, 3, 0);      // column 4
 
-
-            ticektRow.add(subjectLabel, 0, 0);  // Column 0
-            ticektRow.add(statusBox, 1, 0);     // Column 1
-            ticektRow.add(descLabel, 2, 0);     // Column 2
-            ticektRow.add(viewButton, 3, 0);    // Column 3
 
             ticketContainer.getChildren().add(ticektRow);
         }
@@ -455,55 +516,75 @@ public class TicketController {
             //ticket row builder from loadTicketsFromFile
             //create ticket row
             GridPane ticektRow = new GridPane();
+            ticektRow.setPrefWidth(640); // Fixed width for row
+            ticektRow.setMaxWidth(640);
+            ticektRow.setMinWidth(640);
             ticektRow.setHgap(10);
             ticektRow.setVgap(5);
             ticektRow.setPadding(new Insets(5));
             ticektRow.setStyle("-fx-border-color: gray; -fx-background-color: #FFFFFF;");
 
             //for alignment text
-            ColumnConstraints col1 = new ColumnConstraints();
-            col1.setMinWidth(180); // subject label
-            ColumnConstraints col2 = new ColumnConstraints();
-            col2.setMinWidth(100); // status Icon
+            ColumnConstraints col1 = new ColumnConstraints(120);// subject label
+            ColumnConstraints col2 = new ColumnConstraints(40);// status Icon
             ColumnConstraints col3 = new ColumnConstraints();
             col3.setHgrow(Priority.ALWAYS); // description label (expandable)
-            ColumnConstraints col4 = new ColumnConstraints();
+            ColumnConstraints col4 = new ColumnConstraints(180); //priority + assigned agent + arrow
             col4.setMinWidth(50); // arrow to view ticket
             ticektRow.getColumnConstraints().addAll(col1, col2, col3, col4);
 
             //subject of ticket
             Label subjectLabel = new Label(subject);
-            subjectLabel.setMaxWidth(180);
-            HBox.setHgrow(subjectLabel, Priority.NEVER);
+            subjectLabel.setMaxWidth(120);
+            subjectLabel.setWrapText(false);
+            subjectLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
 
             //status of ticket as a symbol using fontawesome
             FontIcon statusIcon = getStatusIcons(status);
-            statusIcon.setIconSize(16);
-            statusIcon.setIconColor(Color.BLACK);
-            // Wrap status in an HBox for consistent layout
-            HBox statusBox = new HBox(statusIcon);
-            statusBox.setAlignment(Pos.CENTER_LEFT);
-            statusBox.setPrefWidth(100);
+            HBox statusBox = new HBox(statusIcon); //wraps icon in a hbox for a consistant layout
+            statusBox.setAlignment(Pos.CENTER);
+            statusBox.setMinWidth(30);
 
             //description of ticket
             Label descLabel = new Label(description);
-            descLabel.setWrapText(true);
-            descLabel.setMaxWidth(Double.MAX_VALUE);
-            HBox.setHgrow(descLabel, Priority.NEVER);
+            descLabel.setWrapText(false);
+            descLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
+            descLabel.setTooltip(new Tooltip(description));
 
-            //space to push arrow button to the far right
-            Region space = new Region();
-            HBox.setHgrow(space, Priority.ALWAYS);
+            // right side : (priorty + assigned agent) + view button
+            HBox rightBox = new HBox(5);
+            rightBox.setAlignment(Pos.CENTER_RIGHT);
 
-            //to create the arrow icon for the 'view the ticket' button
+            //show priority and assigned agent only if agent or admin
+            if (currentUserID.startsWith("ADM") || currentUserID.startsWith("AGT")) {
+                //header for priority and assigned agent
+                assignedAgentLabel.setVisible(true);
+                priorityLabel.setVisible(true);
+
+                //to stop description from overruning
+                descLabel.setMaxWidth(200);
+                // Priority
+                FontIcon priorityIcon = getPriorityIcon(priority); // (Your method to return color/icon)
+                Label priorityLabel = new Label(priority, priorityIcon);
+                priorityLabel.setStyle("-fx-font-weight: bold;");
+                priorityLabel.setMinWidth(60);
+
+                // Assigned agent, using button as a box
+                Button agentBtn = new Button(assignedAgent);
+                agentBtn.setStyle("-fx-background-color: black; -fx-text-fill: white;");
+                agentBtn.setMinWidth(80);
+
+                rightBox.getChildren().addAll(priorityLabel, agentBtn);
+            }
+
+            // ticekt view button
+            Button viewButton = new Button();
             FontIcon arrowIcon = new FontIcon(FontAwesome.ARROW_RIGHT);
             arrowIcon.setIconSize(16);
             arrowIcon.setIconColor(Color.BLACK);
-            //Creating the button for the arrow
-            Button viewButton = new Button();
             viewButton.setGraphic(arrowIcon);
-            viewButton.setMinWidth(50);
-            HBox.setHgrow(viewButton, Priority.NEVER);
+            viewButton.setMinWidth(30);
+            rightBox.getChildren().add(viewButton);
 
             viewButton.setOnAction(e -> {
                 if (parentController != null) {
@@ -522,12 +603,11 @@ public class TicketController {
                 }
             });
 
+            ticektRow.add(subjectLabel, 0, 0);  // column 0
+            ticektRow.add(statusBox, 1, 0);     // column 1
+            ticektRow.add(descLabel, 2, 0);     // column 2
+            ticektRow.add(rightBox, 3, 0);      // column 4
 
-
-            ticektRow.add(subjectLabel, 0, 0);  // Column 0
-            ticektRow.add(statusBox, 1, 0);     // Column 1
-            ticektRow.add(descLabel, 2, 0);     // Column 2
-            ticektRow.add(viewButton, 3, 0);    // Column 3
 
             ticketContainer.getChildren().add(ticektRow);
         }
@@ -558,6 +638,29 @@ public class TicketController {
             default:
                 iconView = new FontIcon(FontAwesome.QUESTION_CIRCLE);
                 iconView.setIconColor(Color.RED);
+                break;
+        }
+        return iconView;
+    }
+
+    private FontIcon getPriorityIcon(String priority) {
+        FontIcon iconView;
+        switch (priority.toLowerCase()) {
+            case "High":
+                iconView = new FontIcon(FontAwesome.EXCLAMATION_CIRCLE);
+                iconView.setIconColor(Color.RED);
+                break;
+            case "Medium":
+                iconView = new FontIcon(FontAwesome.EXCLAMATION_CIRCLE);
+                iconView.setIconColor(Color.ORANGE);
+                break;
+            case "Low":
+                iconView = new FontIcon(FontAwesome.EXCLAMATION_CIRCLE);
+                iconView.setIconColor(Color.GREEN);
+                break;
+            default:
+                iconView = new FontIcon(FontAwesome.QUESTION_CIRCLE);
+                iconView.setIconColor(Color.BLUE);
                 break;
         }
         return iconView;
