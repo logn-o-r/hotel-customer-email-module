@@ -147,18 +147,19 @@ public class TicketController {
 
                     //to stop description from overruning
                     descLabel.setMaxWidth(200);
+
                     // Priority
-                    FontIcon priorityIcon = getPriorityIcon(priority); // (Your method to return color/icon)
-                    Label priorityLabel = new Label(priority, priorityIcon);
-                    priorityLabel.setStyle("-fx-font-weight: bold;");
-                    priorityLabel.setMinWidth(60);
+                    FontIcon priorityIcon = getPriorityIcon(priority);
+                    HBox priorityBox = new HBox(priorityIcon);
+                    priorityBox.setAlignment(Pos.CENTER_LEFT);
+                    priorityBox.setMinWidth(60);
 
                     // Assigned agent, using button as a box
                     Button agentBtn = new Button(assignedAgent);
                     agentBtn.setStyle("-fx-background-color: black; -fx-text-fill: white;");
                     agentBtn.setMinWidth(80);
 
-                    rightBox.getChildren().addAll(priorityLabel, agentBtn);
+                    rightBox.getChildren().addAll(priorityBox, agentBtn);
                 }
 
                 // ticekt view button
@@ -307,18 +308,19 @@ public class TicketController {
 
                 //to stop description from overruning
                 descLabel.setMaxWidth(200);
+
                 // Priority
-                FontIcon priorityIcon = getPriorityIcon(priority); // (Your method to return color/icon)
-                Label priorityLabel = new Label(priority, priorityIcon);
-                priorityLabel.setStyle("-fx-font-weight: bold;");
-                priorityLabel.setMinWidth(60);
+                FontIcon priorityIcon = getPriorityIcon(priority);
+                HBox priorityBox = new HBox(priorityIcon);
+                priorityBox.setAlignment(Pos.CENTER_LEFT);
+                priorityBox.setMinWidth(60);
 
                 // Assigned agent, using button as a box
                 Button agentBtn = new Button(assignedAgent);
                 agentBtn.setStyle("-fx-background-color: black; -fx-text-fill: white;");
                 agentBtn.setMinWidth(80);
 
-                rightBox.getChildren().addAll(priorityLabel, agentBtn);
+                rightBox.getChildren().addAll(priorityBox, agentBtn);
             }
 
             // ticekt view button
@@ -435,18 +437,19 @@ public class TicketController {
 
                 //to stop description from overruning
                 descLabel.setMaxWidth(200);
+
                 // Priority
-                FontIcon priorityIcon = getPriorityIcon(priority); // (Your method to return color/icon)
-                Label priorityLabel = new Label(priority, priorityIcon);
-                priorityLabel.setStyle("-fx-font-weight: bold;");
-                priorityLabel.setMinWidth(60);
+                FontIcon priorityIcon = getPriorityIcon(priority);
+                HBox priorityBox = new HBox(priorityIcon);
+                priorityBox.setAlignment(Pos.CENTER_LEFT);
+                priorityBox.setMinWidth(60);
 
                 // Assigned agent, using button as a box
                 Button agentBtn = new Button(assignedAgent);
                 agentBtn.setStyle("-fx-background-color: black; -fx-text-fill: white;");
                 agentBtn.setMinWidth(80);
 
-                rightBox.getChildren().addAll(priorityLabel, agentBtn);
+                rightBox.getChildren().addAll(priorityBox, agentBtn);
             }
 
             // ticekt view button
@@ -563,18 +566,19 @@ public class TicketController {
 
                 //to stop description from overruning
                 descLabel.setMaxWidth(200);
+
                 // Priority
-                FontIcon priorityIcon = getPriorityIcon(priority); // (Your method to return color/icon)
-                Label priorityLabel = new Label(priority, priorityIcon);
-                priorityLabel.setStyle("-fx-font-weight: bold;");
-                priorityLabel.setMinWidth(60);
+                FontIcon priorityIcon = getPriorityIcon(priority);
+                HBox priorityBox = new HBox(priorityIcon);
+                priorityBox.setAlignment(Pos.CENTER_LEFT);
+                priorityBox.setMinWidth(60);
 
                 // Assigned agent, using button as a box
                 Button agentBtn = new Button(assignedAgent);
                 agentBtn.setStyle("-fx-background-color: black; -fx-text-fill: white;");
                 agentBtn.setMinWidth(80);
 
-                rightBox.getChildren().addAll(priorityLabel, agentBtn);
+                rightBox.getChildren().addAll(priorityBox, agentBtn);
             }
 
             // ticekt view button
@@ -640,21 +644,22 @@ public class TicketController {
                 iconView.setIconColor(Color.RED);
                 break;
         }
+        iconView.setIconSize(16);
         return iconView;
     }
 
     private FontIcon getPriorityIcon(String priority) {
         FontIcon iconView;
-        switch (priority.toLowerCase()) {
-            case "High":
+        switch (priority.trim().toLowerCase()) {
+            case "high":
                 iconView = new FontIcon(FontAwesome.EXCLAMATION_CIRCLE);
                 iconView.setIconColor(Color.RED);
                 break;
-            case "Medium":
+            case "medium":
                 iconView = new FontIcon(FontAwesome.EXCLAMATION_CIRCLE);
                 iconView.setIconColor(Color.ORANGE);
                 break;
-            case "Low":
+            case "low":
                 iconView = new FontIcon(FontAwesome.EXCLAMATION_CIRCLE);
                 iconView.setIconColor(Color.GREEN);
                 break;
@@ -663,6 +668,7 @@ public class TicketController {
                 iconView.setIconColor(Color.BLUE);
                 break;
         }
+        iconView.setIconSize(16);
         return iconView;
     }
 

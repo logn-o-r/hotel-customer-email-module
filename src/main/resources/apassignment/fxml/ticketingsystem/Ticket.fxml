@@ -30,7 +30,7 @@
         <columnConstraints>
           <ColumnConstraints hgrow="NEVER" prefWidth="130.0" />
           <ColumnConstraints hgrow="NEVER" prefWidth="40.0" />
-            <ColumnConstraints fillWidth="false" hgrow="ALWAYS" prefWidth="200.0" />
+            <ColumnConstraints fillWidth="false" hgrow="ALWAYS" maxWidth="240.0" prefWidth="200.0" />
             <ColumnConstraints hgrow="NEVER" prefWidth="60.0" />
             <ColumnConstraints hgrow="NEVER" minWidth="-Infinity" prefWidth="130.0" />
         </columnConstraints>

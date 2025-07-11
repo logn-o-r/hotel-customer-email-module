@@ -5,10 +5,10 @@ TCK004 | Cannot login | In-Progress | User cannot login to the dashboard. | High
 TCK005 | UI Bug | In-Progress | Buttons overlap on small screen. | Medium | AGT003 | CUST002 | 01/07/2025
 TCK006 | Feature Request | Closed | Please add dark mode. | Low | AGT003 | CUST003 | 01/07/2025
 TCK007 | Application isnt colourful enough | In-Progress | make it more colourful please | Low | AGT003 | CUST007 | 04/07/2025
-TCK008 | Only Ticketing System Works? | Open | Why dosen't any of the other features work? Are the devs lazy? | Low | none | CUST007 | 04/07/2025
-TCK009 | Problem with button | Open | button somewher dosent work!!!!! | Low | none | CUST007 | 04/07/2025
-TCK010 | Ticket 23 | Open | description very nice | Low | none | CUST007 | 04/07/2025
-TCK011 | new ticket test | Closed | test test | Low | none | CUST007 | 07/07/2025
-TCK012 | ui error | Open | dumb programmer cant do s | Low | none | CUST007 | 10/07/2025
-TCK013 | uidawda | Open | dwdadawdawd | Low | none | CUST007 | 10/07/2025
-TCK014 | di | Open | dwas | Low | none | CUST007 | 10/07/2025
+TCK008 | Only Ticketing System Works? | Open | Why dosen't any of the other features work? Are the devs lazy? | Unset | Unassigned | CUST007 | 04/07/2025
+TCK009 | Problem with button | Open | button somewher dosent work!!!!! | Unset | Unassigned | CUST007 | 04/07/2025
+TCK010 | Ticket 23 | Open | description very nice | Unset | Unassigned | CUST007 | 04/07/2025
+TCK011 | new ticket test | Closed | test test | Unset | Unassigned | CUST007 | 07/07/2025
+TCK012 | ui error | Open | dumb programmer cant do s | Unset | Unassigned | CUST007 | 10/07/2025
+TCK013 | uidawda | Open | dwdadawdawd | Unset | Unassigned | CUST007 | 10/07/2025
+TCK014 | di | Open | dwas | Unset | Unassigned | CUST007 | 10/07/2025

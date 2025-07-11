@@ -58,8 +58,8 @@ public class newTicketController {
 
         String ticketID = generateUniqueTicketID();
         String status = "Open";
-        String priority = "Low";
-        String assignedAgent = "none";
+        String priority = "Unset";
+        String assignedAgent = "Unassigned";
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
         String ticketLine = ticketID + " | " + subject+ " | " + status + " | " + description + " | " + priority + " | " + assignedAgent + " | " + submittedByUserID + " | " + date;
