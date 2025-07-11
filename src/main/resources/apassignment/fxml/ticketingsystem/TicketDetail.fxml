@@ -46,8 +46,13 @@
                      <children>
                         <Button fx:id="ticketCloseButton" mnemonicParsing="false" onAction="#handleCloseTicket" text="Close Ticket" />
                         <Button fx:id="addResponseButton" mnemonicParsing="false" onAction="#showResponseInputnButton" text="Add Response" visible="false" />
-                        <Label fx:id="ticketsAssignedAgentLabel" text="Agent Assigned: " visible="false" />
-                        <ChoiceBox fx:id="assignAgentChoice" prefHeight="25.0" prefWidth="110.0" visible="false" />
+                        <Button fx:id="claimTicketButton" mnemonicParsing="false" onAction="#handleClaimTicketAgent" text="Claim Ticket" visible="false" />
+                        <VBox alignment="TOP_CENTER">
+                           <children>
+                              <Label fx:id="ticketsAssignedAgentLabel" text="Agent Assigned: " visible="false" />
+                              <ChoiceBox fx:id="assignAgentChoice" prefHeight="25.0" prefWidth="110.0" visible="false" />
+                           </children>
+                        </VBox>
                      </children>
                   </VBox>
                   <VBox fx:id="responseTextBox" prefWidth="100.0" visible="false">

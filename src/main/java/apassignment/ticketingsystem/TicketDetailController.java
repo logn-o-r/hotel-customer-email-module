@@ -74,6 +74,9 @@ public class TicketDetailController implements Initializable {
     @FXML
     private ChoiceBox<String> assignAgentChoice;
 
+    //button for agents to claim unassigned ticekts
+    @FXML
+    private Button claimTicketButton;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -136,6 +139,14 @@ public class TicketDetailController implements Initializable {
         }
 
         //role base access
+        if (status.equals("Open") && currentLoggedUserID.startsWith("AGT") && agent.equals("Unassigned")) {
+           claimTicketButton.setVisible(true);
+           claimTicketButton.setManaged(true);
+        } else {
+            claimTicketButton.setVisible(false);
+            claimTicketButton.setManaged(false);
+        }
+
         if (currentLoggedUserID.startsWith("ADM") || currentLoggedUserID.startsWith("AGT")) {
             priorityBox.getItems().addAll("Low", "Medium", "High");
 
@@ -288,6 +299,13 @@ public class TicketDetailController implements Initializable {
     private void showResponseInputnButton() {
         responseTextBox.setVisible(true);
         responseTextBox.setManaged(true);
+    }
+
+    @FXML
+    private void handleClaimTicketAgent() {
+        updateAssignedAgent(ticketID, currentLoggedUserID);
+        claimTicketButton.setVisible(false);
+        claimTicketButton.setManaged(false);
     }
 
     @FXML

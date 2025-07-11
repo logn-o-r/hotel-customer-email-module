@@ -10,5 +10,5 @@ TCK009 | Problem with button | Open | button somewher dosent work!!!!! | Medium 
 TCK010 | Ticket 23 | Open | description very nice | Medium | AGT004 | CUST007 | 04/07/2025
 TCK011 | new ticket test | Closed | test test | Unset | Unassigned | CUST007 | 07/07/2025
 TCK012 | ui error | Open | dumb programmer cant do s | Unset | AGT005 | CUST007 | 10/07/2025
-TCK013 | uidawda | Open | dwdadawdawd | Unset | Unassigned | CUST007 | 10/07/2025
+TCK013 | uidawda | Open | dwdadawdawd | Medium | AGT003 | CUST007 | 10/07/2025
 TCK014 | di | Open | dwas | Unset | Unassigned | CUST007 | 10/07/2025
