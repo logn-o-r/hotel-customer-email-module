@@ -19,12 +19,10 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -66,6 +64,34 @@ public class TicketDetailController implements Initializable {
 
     private Pane parentContainer;
 
+    //for ticket priority dropdown menu
+    @FXML
+    private ChoiceBox<String> priorityBox;
+
+    //for admin to assign tickets to agents
+    @FXML
+    private Label ticketsAssignedAgentLabel;
+    @FXML
+    private ChoiceBox<String> assignAgentChoice;
+
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        // Set icon for back button
+        backButton.setText("");
+        FontIcon arrowIcon = new FontIcon(FontAwesome.ARROW_LEFT);
+        arrowIcon.setIconSize(16);
+        arrowIcon.setIconColor(Color.BLACK);
+        backButton.setGraphic(arrowIcon);
+        backButton.setMinWidth(50);
+        HBox.setHgrow(backButton, Priority.NEVER);
+
+        backButton.setOnAction(event -> {
+            parentController.loadView("/apassignment/fxml/ticketingsystem/Ticket.fxml");
+        });
+    }
+
 
     public void setTicketDetails(String id, String subject, String status, String createdDate, String priority, String assignedAgent, String userID, String description) {
 
@@ -86,7 +112,10 @@ public class TicketDetailController implements Initializable {
         //sets the date it was created
         dateCreated.setText("Created on : " + createdDate);
 
+        //sets the current priority for ticket
         this.ticketPriority = priority;
+        priorityBox.setValue(priority);
+
         this.agent = assignedAgent;
 
         //sets the user who created the ticket
@@ -104,6 +133,77 @@ public class TicketDetailController implements Initializable {
         } else if (!assignedAgent.equals(currentLoggedUserID)) {
             ticketCloseButton.setVisible(false);
             ticketCloseButton.setManaged(false);
+        }
+
+        //role base access
+        if (currentLoggedUserID.startsWith("ADM") || currentLoggedUserID.startsWith("AGT")) {
+            priorityBox.getItems().addAll("Low", "Medium", "High");
+
+            // listener to save changes
+            priorityBox.setOnAction(e -> {
+                if(status.equals("Closed")){
+                    priorityBox.setVisible(false);
+                    priorityBox.setDisable(true);
+                } else {
+                    priorityBox.setVisible(true);
+                    priorityBox.setDisable(false);
+                }
+                String selectedPriority = priorityBox.getValue();
+                if (selectedPriority != null && !selectedPriority.isEmpty()) {
+                    updateTicketPriority(ticketID, selectedPriority);
+                }
+            });
+
+            if (currentLoggedUserID.startsWith("ADM")) {
+                ticketsAssignedAgentLabel.setVisible(true);
+                if(status.equals("Closed")){
+                    if(agent.equals("Unassigned")){
+                        ticketsAssignedAgentLabel.setText("Assigned Agent: Unassigned");
+                    } else {
+                    ticketsAssignedAgentLabel.setText("Assigned Agent: " + getUsernameByUserID(agent) + ", " + agent); }
+                    assignAgentChoice.setVisible(false);
+                    assignAgentChoice.setDisable(true);
+                } else {
+                    assignAgentChoice.setVisible(true);
+                    assignAgentChoice.setDisable(false);
+                    assignAgentChoice.setPrefWidth(250);
+                }
+
+                assignAgentChoice.getItems().clear();
+
+                // adds all active agent accounts to choice box
+                try (BufferedReader br = new BufferedReader(new FileReader("users.txt"))) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        String[] parts = line.split(",");
+                        if (parts.length < 5) continue;
+                        String agentID = parts[1].trim();
+                        String agentUsername = parts[0].trim();
+
+                        //only add agent users
+                        if (agentID.startsWith("AGT")) {
+                            assignAgentChoice.getItems().add(agentID + " : " + agentUsername);
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                // Set current agent as selected (if not unassigned)
+                if (agent != null && !agent.isEmpty() && !agent.equalsIgnoreCase("Unassigned")) {
+                    String agentUsername = getUsernameByUserID(agent);
+                    assignAgentChoice.setValue(agent + " : " + agentUsername);
+                }
+
+                // Listener to save changes
+                assignAgentChoice.setOnAction(event -> {
+                    String selected = assignAgentChoice.getValue();
+                    if (selected != null && !selected.isEmpty()) {
+                        String selectedAgentID = selected.split(" : ")[0].trim(); // extract userID
+                        updateAssignedAgent(ticketID, selectedAgentID);
+                    }
+                });
+            }
         }
 
         //load responses to ticket
@@ -268,7 +368,7 @@ public class TicketDetailController implements Initializable {
 
     private void closeTicketAndSave() {
         this.ticketStatus = "Closed"; // Update status
-        updateTicketStatusInFile(ticketID, "Closed"); //method to update ticket status
+        updateTicketStatus(ticketID, "Closed"); //method to update ticket status
 
         ticketCloseButton.setDisable(true); //removes close ticket button
 
@@ -285,7 +385,7 @@ public class TicketDetailController implements Initializable {
         );
     }
 
-    private void updateTicketStatusInFile(String ticketId, String newStatus) {
+    private void updateTicketStatus(String ticketId, String newStatus) {
         Path path = Paths.get("ticket.txt");
         List<String> updatedLines = new ArrayList<>();
 
@@ -315,22 +415,82 @@ public class TicketDetailController implements Initializable {
         this.parentContainer = parent;
     }
 
+    //to update ticket priority for admin and agent
+    private void updateTicketPriority(String ticketId, String newPriority) {
+        Path filePath = Paths.get("ticket.txt");
 
-    //button to go back to ticket row view
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Set icon for back button
-        backButton.setText("");
-        FontIcon arrowIcon = new FontIcon(FontAwesome.ARROW_LEFT);
-        arrowIcon.setIconSize(16);
-        arrowIcon.setIconColor(Color.BLACK);
-        backButton.setGraphic(arrowIcon);
-        backButton.setMinWidth(50);
-        HBox.setHgrow(backButton, Priority.NEVER);
+        try {
+            List<String> lines = Files.readAllLines(filePath);
+            List<String> updatedLines = new ArrayList<>();
 
-        backButton.setOnAction(event -> {
-            parentController.loadView("/apassignment/fxml/ticketingsystem/Ticket.fxml");
-        });
+            for (String line : lines) {
+                String[] parts = line.split("\\|");
+                if (parts.length >= 8 && parts[0].trim().equals(ticketId)) {
+                    parts[4] = " " + newPriority;
+                    line = String.join(" | ", Arrays.stream(parts).map(String::trim).toArray(String[]::new));
+                }
+                updatedLines.add(line);
+            }
+
+            Files.write(filePath, updatedLines, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+
+            // show confirmation
+//            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//            alert.setTitle("Success");
+//            alert.setHeaderText("Priority Updated");
+//            alert.setContentText("The ticket's priority has been updated to " + newPriority + ".");
+//            alert.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("File Error");
+            alert.setHeaderText("Could not update ticket priority");
+            alert.setContentText("An error occurred while saving the changes.");
+            alert.showAndWait();
+        }
     }
+
+    private void updateAssignedAgent(String ticketID, String newAgentId) {
+        Path path = Paths.get("ticket.txt");
+        List<String> updatedLines = new ArrayList<>();
+
+        try (BufferedReader reader = Files.newBufferedReader(path)) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split("\\|");
+                if (parts.length >= 8 && parts[0].trim().equals(ticketID)) {
+                    parts[5] = newAgentId;
+                    line = String.join(" | ", parts);
+                }
+                updatedLines.add(line);
+            }
+        } catch (IOException e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to read ticket file.", e);
+        }
+
+        try {
+            Files.write(path, updatedLines); // updates
+        } catch (IOException e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to write updated ticket file.", e);
+        }
+    }
+
+    //retrives the username attached to the userID
+    public String getUsernameByUserID(String userID) {
+        try (BufferedReader br = new BufferedReader(new FileReader("users.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length >= 2 && parts[1].trim().equals(userID)) {
+                    return parts[0].trim(); // returns the username
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "Unknown"; // default if userID is not found
+    }
+
 
 }

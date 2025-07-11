@@ -1,4 +1,7 @@
 maria,CUST001,mk23@gmail.com,12345678,Customer
 admin,ADM002,imaan@gmail.com,adm123,Admin
 agent,AGT003,boss@gmail.com,agt123,Agent
+perry,AGT004,ppsww@gmail.com,agt123,Agent
+kevin,AGT005,kev@gmail.com,agt123,Agent
+sarah,AGT006,sar@gmail.com,agt123,Agent
 user,CUST007,kono@gmail.com,cust123,Customer

@@ -50,7 +50,7 @@ public class TicketSorterController {
 
     @FXML
     private void handleUnclaimedTickets() {
-        ticketController.filterTickets(parts -> parts[5].trim().equals("none")); // shows unclaimed tickets/tickets with no assigned agent
+        ticketController.searchFilterTickets(parts -> parts[5].trim().equals("Unassigned"), "close"); // shows unclaimed tickets/tickets with no assigned agent
     }
 
     //to filter tickets by subject title using a search bar, this is the button to intialize filter
@@ -110,6 +110,8 @@ public class TicketSorterController {
 
             //so only tickets belong to the currently logged on customer/user is displayed
             if (currentLoggedUserID.startsWith("ADM")) {
+                unclaimedTicketsButton.setVisible(true);
+                unclaimedTicketsButton.setDisable(false);
                 myTicketButtom.setText("All Tickets");
                 ticketController.filterTickets(parts -> true); // show all tickets
             } else if (currentLoggedUserID.startsWith("CUST")) {
@@ -178,7 +180,7 @@ public class TicketSorterController {
 
             // pass values for tickets
             TicketDetailController detailController = loader.getController();
-            detailController.setTicketDetails(id, subject, status,priority, dateCreated, assignedAgent, submittedBy, description);
+            detailController.setTicketDetails(id, subject, status, dateCreated, priority, assignedAgent, submittedBy, description);
 
             // Set parent controller
             detailController.setParentController(this);

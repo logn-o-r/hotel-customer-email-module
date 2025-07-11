@@ -16,6 +16,10 @@ import javafx.scene.paint.Color;
 import javafx.fxml.FXML;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -514,6 +518,10 @@ public class TicketController {
             }
             else if (userIdFilter != null && userIdFilter.startsWith("AGT")) {
                 if (!assignedAgent.equals(userIdFilter)) continue;
+            }
+
+            if (userIdFilter != null && userIdFilter.equals("close")) {
+                if (status.equals("Closed")) continue;
             }
 
             //ticket row builder from loadTicketsFromFile
