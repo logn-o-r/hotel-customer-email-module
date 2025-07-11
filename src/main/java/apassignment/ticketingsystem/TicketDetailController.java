@@ -156,6 +156,12 @@ public class TicketDetailController implements Initializable {
         boolean isUnassigned = agent.equalsIgnoreCase("Unassigned");
         boolean isClosed = status.equalsIgnoreCase("Closed");
 
+        if (isAdmin || isAgent) {
+            priorityIconContainer.setVisible(true);
+        } else {
+            priorityIconContainer.setVisible(false);
+        }
+
         //show claim ticket button if current user is an agent and the ticket has no assigned agent
         if (isAgent && isUnassigned) {
            claimTicketButton.setVisible(true);
