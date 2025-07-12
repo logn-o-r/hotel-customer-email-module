@@ -1,0 +1,2 @@
+guest@hotel.com|agent@hotel.com|Room Issue|Please fix the air conditioner.|2025-07-10
+admin@hotel.com|guest@hotel.com|Welcome|Thank you for staying with us.|2025-07-11
