@@ -42,6 +42,11 @@
                      </children>
                   </VBox>
                   <VBox fx:id="responseContainer" prefHeight="62.0" prefWidth="523.0" spacing="10.0" />
+                  <Label fx:id="ticketClosedInfoLabel" alignment="CENTER" prefWidth="650.0" textAlignment="CENTER" visible="false">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
                   <VBox alignment="CENTER" prefWidth="100.0" spacing="10.0">
                      <children>
                         <Button fx:id="ticketCloseButton" mnemonicParsing="false" onAction="#handleCloseTicket" text="Close Ticket" />

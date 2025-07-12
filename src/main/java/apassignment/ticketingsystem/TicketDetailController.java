@@ -80,6 +80,10 @@ public class TicketDetailController implements Initializable {
     @FXML
     private Button claimTicketButton;
 
+    //to display closed ticket information
+    @FXML
+    private Label ticketClosedInfoLabel;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -126,10 +130,12 @@ public class TicketDetailController implements Initializable {
 
         //sets the agents assigned to ticket (admin only)
         this.agent = assignedAgent;
-        if(agent.equals("Unassigned")) {
-            assignAgentChoice.setValue(agent);
-        } else  {
-        assignAgentChoice.setValue(agent + " : " + getUsernameByUserID(agent)); }
+        //for role based access and easier management of if statements
+        boolean isAgent = currentLoggedUserID.startsWith("AGT");
+        boolean isAdmin = currentLoggedUserID.startsWith("ADM");
+        boolean isAssignedAgent = currentLoggedUserID.equals(agent);
+        boolean isUnassigned = agent.equalsIgnoreCase("Unassigned");
+        boolean isClosed = status.equalsIgnoreCase("Closed");
 
 
         //sets the user who created the ticket
@@ -141,20 +147,22 @@ public class TicketDetailController implements Initializable {
         descriptionContainer.getChildren().add(desx);
 
         //if ticket is closed, no button to close the ticket
-        if(status.equalsIgnoreCase("Closed") && (ticketCloseButton != null)) {
+        if(isClosed && (ticketCloseButton != null)) {
             ticketCloseButton.setVisible(false);
             ticketCloseButton.setManaged(false);
-        } else if (!assignedAgent.equals(currentLoggedUserID)) {
+            loadClosedTicketInfo();
+        } else if (!isAssignedAgent) {
             ticketCloseButton.setVisible(false);
             ticketCloseButton.setManaged(false);
+            ticketClosedInfoLabel.setVisible(false);
+            ticketClosedInfoLabel.setManaged(false);
         }
 
         //role base access
-        boolean isAgent = currentLoggedUserID.startsWith("AGT");
-        boolean isAdmin = currentLoggedUserID.startsWith("ADM");
-        boolean isAssignedAgent = currentLoggedUserID.equals(agent);
-        boolean isUnassigned = agent.equalsIgnoreCase("Unassigned");
-        boolean isClosed = status.equalsIgnoreCase("Closed");
+        if(isUnassigned) {
+            assignAgentChoice.setValue(agent);
+        } else  {
+            assignAgentChoice.setValue(agent + " : " + getUsernameByUserID(agent)); }
 
         if (isAdmin || isAgent) {
             priorityIconContainer.setVisible(true);
@@ -446,6 +454,7 @@ public class TicketDetailController implements Initializable {
     private void closeTicketAndSave() {
         this.ticketStatus = "Closed"; // Update status
         updateTicketStatus(ticketID, "Closed"); //method to update ticket status
+        recordClosedTicketInfo(ticketID, currentLoggedUserID);
 
         ticketCloseButton.setDisable(true); //removes close ticket button
 
@@ -576,6 +585,69 @@ public class TicketDetailController implements Initializable {
                 userSubmitted.getText().replace("Submitted by : ", ""),
                 ((Text) descriptionContainer.getChildren().get(0)).getText()
         );
+    }
+
+    private void loadClosedTicketInfo() {
+        Path path = Paths.get("closedTickets.txt");
+
+        try (BufferedReader reader = Files.newBufferedReader(path)) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split("\\|");
+                if (parts.length >= 4) {
+                    String closedTicketID = parts[1].trim();
+                    String closedByUserID = parts[2].trim();
+                    String dateClosed = parts[3].trim();
+
+                    if (closedTicketID.equals(ticketID)) {
+                        String username = getUsernameByUserID(closedByUserID);
+                        ticketClosedInfoLabel.setText(
+                                "Closed by: " + username + " (" + closedByUserID + ")\nClosed on: " + dateClosed
+                        );
+                        ticketClosedInfoLabel.setVisible(true);
+                        ticketClosedInfoLabel.setManaged(true);
+                        return;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to load closed ticket info.", e);
+        }
+
+        ticketClosedInfoLabel.setVisible(false);
+        ticketClosedInfoLabel.setManaged(false);
+    }
+
+    private void recordClosedTicketInfo(String ticketID, String closedByUserID) {
+        String closeID = generateUniqueCloseID(); // generates in format of CL000
+        String dateClosed = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        String line = closeID + " | " + ticketID + " | " + closedByUserID + " | " + dateClosed;
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("closedTickets.txt", true))) {
+            writer.write(line);
+            writer.newLine();
+        } catch (IOException e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to write closed ticket log.", e);
+        }
+    }
+
+    private String generateUniqueCloseID() {
+        try {
+            List<String> lines = Files.readAllLines(Paths.get("closedTickets.txt"));
+            int maxId = lines.stream()
+                    //splits the line by | symbol and takes the first part assuming closeID is the first variable
+                    // it removes any leading/trailing whitespace then removes the TCK prefix
+                    //leaving the nummeric part
+                    .map(line -> line.split("\\|")[0].trim().replace("CL", ""))
+                    //then ensures only valid numeric IDs are passed/filters the stream to keep only the strings that are pure digits
+                    .filter(id -> id.matches("\\d+"))
+                    .mapToInt(Integer::parseInt)
+                    //finds the largest code/highest closeID, if it has no max, returns 0
+                    .max().orElse(0);
+            return String.format("CL%03d", maxId + 1);
+        } catch (IOException e) {
+            return "CL001";
+        }
     }
 
 }
