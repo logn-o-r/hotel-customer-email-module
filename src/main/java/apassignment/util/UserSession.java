@@ -10,4 +10,9 @@ public class UserSession {
     public static String getCurrentUserID() {
         return currentUserID;
     }
+
+    public static void clear() {
+        currentUserID = null;
+    }
+
 }

@@ -57,6 +57,8 @@ public class AdminMainController {
 
         currentLoggedUserID = UserSession.getCurrentUserID();
 
+        loadView("/apassignment/fxml/dashboard/dashboard.fxml");
+
         // hide Manage User button for customer and agent as only admin should have access
         if (currentLoggedUserID != null && (currentLoggedUserID.startsWith("CUST") || currentLoggedUserID.startsWith("AGT"))) {
             usermanagementIcon.setVisible(false);
@@ -65,7 +67,7 @@ public class AdminMainController {
         }
 
         //Set click handlers (to make the label icons into buttons)
-        //dashboardIcon.setOnMouseClicked(e -> loadView("Dashboard.fxml"));
+        dashboardIcon.setOnMouseClicked(e -> loadView("/apassignment/fxml/dashboard/dashboard.fxml"));
         usermanagementIcon.setOnMouseClicked(e -> loadView("/apassignment/fxml/usermanagement/management.fxml"));
         ticketIcon.setOnMouseClicked(e -> loadView("/apassignment/fxml/ticketingsystem/TicketSorter.fxml"));
         //faqIcon.setOnMouseClicked(e -> loadView("FAQ.fxml"));
@@ -86,11 +88,6 @@ public class AdminMainController {
         try{
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
             Node content = loader.load();
-
-            //for debugging and making sure the ticket button works
-            //if (fxmlFile.equals("TicketSorter.fxml")) {
-                //System.out.println("Ticekt button pressed");
-            //}
 
             mainContent.getChildren().setAll(content);
         }

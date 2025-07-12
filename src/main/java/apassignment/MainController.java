@@ -48,8 +48,10 @@ public class MainController {
 
         currentLoggedUserID = UserSession.getCurrentUserID();
 
+        loadView("/apassignment/fxml/dashboard/dashboard.fxml");
+
         //Set click handlers (to make the label icons into buttons)
-        //dashboardIcon.setOnMouseClicked(e -> loadView("Dashboard.fxml"));TicketSorter.fxml
+        dashboardIcon.setOnMouseClicked(e -> loadView("/apassignment/fxml/dashboard/dashboard.fxml"));
         ticketIcon.setOnMouseClicked(e -> loadView("/apassignment/fxml/ticketingsystem/TicketSorter.fxml"));
         //faqIcon.setOnMouseClicked(e -> loadView("FAQ.fxml"));
         //chatIcon.setOnMouseClicked(e -> loadView("LiveChat.fxml"));
@@ -69,11 +71,6 @@ public class MainController {
         try{
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
             Node content = loader.load();
-
-            //for debugging and making sure the ticket button works
-            //if (fxmlFile.equals("TicketSorter.fxml")) {
-                //System.out.println("Ticekt button pressed");
-            //}
 
             mainContent.getChildren().setAll(content);
         }
